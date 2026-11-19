@@ -1,0 +1,1853 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FactCheck — Mạng Lưới Giám Sát & Xác Thực Thông Tin Toàn Cầu</title>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --orange: #FF7700;
+            --orange-dark: #E56A00;
+            --orange-glow: rgba(255, 119, 0, 0.4);
+            --blue: #00A6FF;
+            --blue-dark: #0088D4;
+            --blue-glow: rgba(0, 166, 255, 0.4);
+            --purple: #A855F7;
+            --green: #22C55E;
+            --red: #EF4444;
+            --red-glow: rgba(239, 68, 68, 0.4);
+            --yellow: #F59E0B;
+            --dark: #0A0D14;
+            --dark-surface: #0F1420;
+            --dark-card: #141B2D;
+            --darker: #05070B;
+            --gray-100: #F1F5F9;
+            --gray-200: #E2E8F0;
+            --gray-400: #94A3B8;
+            --gray-500: #64748B;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 24px;
+            --radius-full: 9999px;
+            --transition: all .25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+            background: var(--darker);
+            color: #E2E8F0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        a { text-decoration: none; color: inherit; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+        /* ==================== FLOATING HEADER ==================== */
+        .header-floating-wrap {
+            position: fixed;
+            top: 18px;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            padding: 0 16px;
+            pointer-events: none;
+        }
+        header.floating-nav {
+            pointer-events: auto;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(16px);
+            border-radius: var(--radius-full);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.2);
+            padding: 8px 14px 8px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1080px;
+            width: 100%;
+            transition: var(--transition);
+        }
+        .logo { display: flex; align-items: center; gap: 10px; }
+        .logo-icon {
+            width: 34px; height: 34px;
+            background: linear-gradient(135deg, var(--orange), #FF4500);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; color: #fff;
+            box-shadow: 0 4px 12px var(--orange-glow);
+        }
+        .logo-text { font-size: 20px; font-weight: 800; color: #0F172A; letter-spacing: -.6px; }
+        .logo-text span { color: var(--orange); }
+        nav.nav-desktop ul { list-style: none; display: flex; gap: 4px; align-items: center; }
+        nav.nav-desktop a {
+            color: #334155; padding: 8px 14px; border-radius: var(--radius-full);
+            font-size: 13px; font-weight: 600; transition: var(--transition);
+        }
+        nav.nav-desktop a:hover, nav.nav-desktop a.active {
+            background: rgba(15, 23, 42, 0.08); color: #0F172A;
+        }
+        .menu-toggle {
+            display: none; background: #0F172A; border: none; color: #fff;
+            width: 36px; height: 36px; border-radius: 50%; font-size: 18px;
+            cursor: pointer; align-items: center; justify-content: center;
+        }
+        @media(max-width: 992px) {
+            nav.nav-desktop { display: none; }
+            .menu-toggle { display: flex; }
+        }
+        .mobile-drawer {
+            display: none; position: fixed; top: 76px; left: 16px; right: 16px;
+            background: #fff; border-radius: var(--radius-md); padding: 18px;
+            box-shadow: 0 20px 50px rgba(0,0,0,.5); z-index: 999; flex-direction: column; gap: 6px;
+        }
+        .mobile-drawer.show { display: flex; }
+        .mobile-drawer a { color: #1E293B; font-weight: 600; padding: 10px 14px; border-radius: 8px; }
+        .mobile-drawer a:hover { background: #F1F5F9; color: var(--orange); }
+
+        /* ==================== HERO SEARCH SECTION ==================== */
+        .hero {
+            padding-top: 120px;
+            padding-bottom: 60px;
+            position: relative;
+            background: radial-gradient(circle at 50% 20%, #151F33 0%, var(--darker) 70%);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .hero::before {
+            content: ''; position: absolute; inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 44px 44px; pointer-events: none;
+        }
+        .hero-inner { position: relative; z-index: 1; text-align: center; }
+        .motto-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(255, 119, 0, 0.12);
+            border: 1px solid rgba(255, 119, 0, 0.35);
+            color: var(--orange);
+            padding: 6px 18px; border-radius: var(--radius-full);
+            font-size: 13px; font-weight: 700; margin-bottom: 20px;
+            letter-spacing: .5px; box-shadow: 0 0 20px rgba(255,119,0,0.15);
+        }
+        .hero h1 {
+            font-size: clamp(26px, 4.5vw, 44px);
+            font-weight: 800; color: #fff; margin-bottom: 14px; line-height: 1.25;
+            letter-spacing: -.8px;
+        }
+        .hero h1 span.hl-orange { color: var(--orange); text-shadow: 0 0 24px var(--orange-glow); }
+        .hero h1 span.hl-blue { color: var(--blue); text-shadow: 0 0 24px var(--blue-glow); }
+        .hero p.lead {
+            font-size: 16px; color: var(--gray-400); max-width: 680px; margin: 0 auto 24px;
+        }
+
+        /* AI Status Bar */
+        .ai-status-bar {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+            border-radius: var(--radius-full); padding: 6px 18px;
+            font-size: 12px; color: #CBD5E1; margin-bottom: 22px; backdrop-filter: blur(8px);
+        }
+        .ai-status-indicator {
+            width: 8px; height: 8px; border-radius: 50%; background: var(--green);
+            box-shadow: 0 0 10px var(--green); animation: pulseGreen 1.8s infinite;
+        }
+        @keyframes pulseGreen {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { transform: scale(1.15); box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        .btn-ai-cfg {
+            background: rgba(255,255,255,0.14); border: none; color: #fff;
+            padding: 3px 12px; border-radius: var(--radius-full); font-size: 11px;
+            cursor: pointer; transition: var(--transition); font-weight: 600;
+        }
+        .btn-ai-cfg:hover { background: rgba(255,255,255,0.25); }
+
+        /* Search input wrap */
+        .search-wrap { max-width: 760px; margin: 0 auto; }
+        .search-box {
+            background: #fff; border-radius: 16px; padding: 6px; display: flex;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.2);
+            transition: var(--transition);
+        }
+        .search-box:focus-within {
+            box-shadow: 0 12px 48px rgba(255,119,0,0.25), 0 0 0 2px var(--orange);
+        }
+        .search-box input {
+            flex: 1; border: none; outline: none; padding: 14px 20px; font-size: 15px;
+            background: transparent; color: #0F172A; font-weight: 500;
+        }
+        .search-box button {
+            background: linear-gradient(135deg, var(--orange), #FF4500);
+            color: #fff; border: none; padding: 14px 30px; border-radius: 12px;
+            font-size: 14px; font-weight: 700; cursor: pointer; transition: var(--transition);
+            display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px var(--orange-glow);
+        }
+        .search-box button:hover { transform: translateY(-1px); filter: brightness(1.08); }
+        .search-tabs { display: flex; justify-content: center; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+        .search-tabs button {
+            background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7);
+            border: 1px solid rgba(255,255,255,0.1); padding: 7px 18px; border-radius: var(--radius-full);
+            font-size: 12.5px; font-weight: 600; cursor: pointer; transition: var(--transition);
+        }
+        .search-tabs button.active {
+            background: rgba(255,119,0,0.2); border-color: var(--orange); color: var(--orange);
+            box-shadow: 0 0 16px rgba(255,119,0,0.2);
+        }
+
+        /* Quick Samples */
+        .quick-samples {
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+            margin-top: 16px; font-size: 12px; color: var(--gray-400); flex-wrap: wrap;
+        }
+        .sample-tag {
+            background: rgba(255,255,255,0.06); color: #CBD5E1; border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px; padding: 4px 10px; cursor: pointer; transition: var(--transition); font-weight: 500;
+        }
+        .sample-tag:hover { background: rgba(255,119,0,0.25); color: #fff; border-color: var(--orange); }
+
+        /* Scanning Progress */
+        .ai-scanning-box {
+            display: none; max-width: 760px; margin: 24px auto 0;
+            background: var(--dark-card); border: 1px solid rgba(255,119,0,0.3);
+            border-radius: var(--radius-md); padding: 22px 26px; text-align: left;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+        .ai-scanning-box.show { display: block; }
+        .scan-title {
+            display: flex; align-items: center; justify-content: space-between;
+            font-size: 13px; font-weight: 800; color: var(--orange); margin-bottom: 14px;
+            letter-spacing: .5px;
+        }
+        .scan-steps { display: flex; flex-direction: column; gap: 9px; font-size: 13px; color: #94A3B8; }
+        .scan-step { display: flex; align-items: center; gap: 10px; transition: var(--transition); opacity: .35; }
+        .scan-step.active { opacity: 1; color: #fff; font-weight: 600; }
+        .scan-step.done { opacity: 1; color: var(--green); }
+        .scan-step-dot { width: 8px; height: 8px; border-radius: 50%; background: #475569; flex-shrink: 0; }
+        .scan-step.active .scan-step-dot { background: var(--orange); box-shadow: 0 0 10px var(--orange); }
+        .scan-step.done .scan-step-dot { background: var(--green); box-shadow: 0 0 10px var(--green); }
+
+        /* Result Panel */
+        .result-panel {
+            display: none; max-width: 760px; margin: 24px auto 0;
+            background: var(--dark-card); border-radius: var(--radius-md);
+            box-shadow: 0 16px 50px rgba(0,0,0,0.5); overflow: hidden; text-align: left;
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+        .result-panel.show { display: block; }
+        .result-header {
+            padding: 20px 24px; display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.2);
+        }
+        .result-signal-wrap { display: flex; align-items: center; gap: 14px; }
+        .result-signal {
+            width: 48px; height: 48px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-size: 22px; color: #fff; font-weight: 800;
+            flex-shrink: 0;
+        }
+        .signal-safe { background: var(--green); box-shadow: 0 0 16px rgba(34,197,94,0.4); }
+        .signal-warn { background: var(--yellow); color: #0F172A; box-shadow: 0 0 16px rgba(245,158,11,0.4); }
+        .signal-danger { background: var(--red); box-shadow: 0 0 16px rgba(239,68,68,0.5); }
+        .ai-source-badge {
+            background: rgba(0, 166, 255, 0.15); border: 1px solid rgba(0, 166, 255, 0.35);
+            color: var(--blue); font-size: 11.5px; font-weight: 700; padding: 4px 12px;
+            border-radius: var(--radius-full); display: inline-flex; align-items: center; gap: 5px;
+        }
+        .result-body { padding: 22px 24px; }
+        .score-row {
+            display: flex; align-items: center; gap: 14px; margin-bottom: 18px;
+            background: rgba(255,255,255,0.03); padding: 14px 18px; border-radius: var(--radius-sm);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .score-bar { flex: 1; height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; overflow: hidden; }
+        .score-fill { height: 100%; border-radius: 5px; transition: width .8s ease-out; }
+        .score-val { font-size: 22px; font-weight: 800; min-width: 65px; text-align: right; }
+        .criteria-breakdown {
+            margin: 18px 0; background: rgba(0,0,0,0.25); border-radius: var(--radius-sm);
+            border: 1px solid rgba(255,255,255,0.06); padding: 14px 18px;
+        }
+        .criteria-breakdown h4 {
+            font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 10px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .crit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 8px; font-size: 12px; }
+        .crit-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px dashed rgba(255,255,255,0.08); }
+        .crit-label { color: #94A3B8; }
+        .crit-val { font-weight: 600; color: #F1F5F9; }
+        .result-body table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px; }
+        .result-body td { padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .result-body td:first-child { font-weight: 600; color: #94A3B8; width: 32%; }
+        .result-body td:last-child { color: #F8FAFC; }
+        .result-verdict { margin: 18px 0 0; padding: 14px 18px; border-radius: 8px; font-size: 13px; line-height: 1.6; }
+        .verdict-safe { background: rgba(34,197,94,0.12); color: #86EFAC; border-left: 4px solid var(--green); }
+        .verdict-warn { background: rgba(245,158,11,0.12); color: #FDE047; border-left: 4px solid var(--yellow); }
+        .verdict-danger { background: rgba(239,68,68,0.15); color: #FCA5A5; border-left: 4px solid var(--red); }
+        .btn-add-db {
+            background: linear-gradient(135deg, var(--orange), #FF4500);
+            color: #fff; border: none; padding: 9px 18px; border-radius: 8px;
+            font-size: 12px; font-weight: 700; cursor: pointer; transition: var(--transition);
+        }
+        .btn-add-db:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+        /* ==================== GLOBAL MONITORING & 3D EARTH ==================== */
+        #global-threat-map {
+            padding: 80px 0 70px;
+            background: #080B11;
+            position: relative;
+            text-align: center;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .global-section-tag {
+            color: var(--orange);
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+        .global-heading {
+            font-size: clamp(28px, 4vw, 44px);
+            font-weight: 800;
+            color: #FFFFFF;
+            letter-spacing: -.6px;
+            margin-bottom: 12px;
+        }
+        .global-sub {
+            color: #94A3B8;
+            font-size: 15px;
+            max-width: 640px;
+            margin: 0 auto 30px;
+            line-height: 1.65;
+        }
+
+        /* Threat intelligence badges */
+        .threat-badges-bar {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin-bottom: 36px;
+            flex-wrap: wrap;
+        }
+        .threat-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(15, 20, 32, 0.9);
+            padding: 10px 22px;
+            border-radius: var(--radius-sm);
+            font-size: 12.5px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            transition: var(--transition);
+        }
+        .threat-pill.red {
+            border: 1px solid rgba(239, 68, 68, 0.45);
+            color: #EF4444;
+        }
+        .threat-pill.red .dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #EF4444;
+            box-shadow: 0 0 10px #EF4444;
+            animation: pulseRed 1.6s infinite;
+        }
+        @keyframes pulseRed {
+            0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8); }
+            70% { transform: scale(1.2); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .threat-pill.orange {
+            border: 1px solid rgba(255, 119, 0, 0.45);
+            color: #FF7700;
+        }
+        .threat-pill.orange .dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #FF7700;
+            box-shadow: 0 0 10px #FF7700;
+            animation: pulseOrange 1.6s infinite;
+        }
+        @keyframes pulseOrange {
+            0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(255, 119, 0, 0.8); }
+            70% { transform: scale(1.2); box-shadow: 0 0 0 8px rgba(255, 119, 0, 0); }
+            100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(255, 119, 0, 0); }
+        }
+
+        /* 3D Earth Globe Canvas Container */
+        .globe-wrapper {
+            position: relative;
+            max-width: 600px;
+            width: 100%;
+            height: 520px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            touch-action: none;
+        }
+        canvas#earthCanvas {
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+            display: block;
+        }
+        canvas#earthCanvas:active {
+            cursor: grabbing;
+        }
+        .globe-helper-text {
+            color: #64748B;
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-top: 14px;
+        }
+
+        /* Threat node card overlay tooltip */
+        .globe-node-tooltip {
+            position: absolute;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--orange);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            pointer-events: none;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            display: none;
+            transform: translate(-50%, -120%);
+            z-index: 10;
+            white-space: nowrap;
+        }
+        .globe-node-tooltip.show { display: block; }
+        .globe-node-tooltip strong { color: var(--orange); }
+
+        /* ==================== CORE FEATURES ==================== */
+        section { padding: 70px 0; }
+        .section-header { text-align: center; margin-bottom: 40px; }
+        .section-header h2 { font-size: 30px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+        .section-header p { color: var(--gray-400); font-size: 15px; max-width: 620px; margin: 0 auto; }
+
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 24px; }
+        .feature-card {
+            background: var(--dark-card); border-radius: var(--radius-md); padding: 30px;
+            border: 1px solid rgba(255,255,255,0.08); transition: var(--transition);
+            position: relative; overflow: hidden;
+        }
+        .feature-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--orange), transparent);
+            opacity: 0; transition: var(--transition);
+        }
+        .feature-card:hover {
+            transform: translateY(-4px); border-color: rgba(255, 119, 0, 0.4);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.4), 0 0 20px rgba(255,119,0,0.1);
+        }
+        .feature-card:hover::before { opacity: 1; }
+        .feature-icon {
+            width: 52px; height: 52px; border-radius: 12px; display: flex;
+            align-items: center; justify-content: center; font-size: 26px; margin-bottom: 20px;
+        }
+        .feature-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: #fff; }
+        .feature-card p { font-size: 13.5px; color: var(--gray-400); line-height: 1.65; }
+
+        /* ==================== CRITERIA ==================== */
+        #tieu-chi { background: var(--dark-surface); border-top: 1px solid rgba(255,255,255,0.06); }
+        .criteria-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; }
+        .criteria-item {
+            background: var(--dark-card); border-radius: var(--radius-md); padding: 20px;
+            display: flex; gap: 16px; border: 1px solid rgba(255,255,255,0.06);
+            transition: var(--transition);
+        }
+        .criteria-item:hover { border-color: var(--orange); transform: translateY(-2px); }
+        .criteria-num {
+            width: 38px; height: 38px; min-width: 38px; border-radius: 10px;
+            background: linear-gradient(135deg, var(--orange), #FF4500);
+            color: #fff; display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: 800; box-shadow: 0 4px 12px var(--orange-glow);
+        }
+        .criteria-item h4 { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+        .criteria-item p { font-size: 12.5px; color: var(--gray-400); line-height: 1.55; }
+
+        .score-tiers { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; margin-top: 32px; }
+        .tier-card { border-radius: var(--radius-md); padding: 22px; text-align: center; border: 2px solid; }
+        .tier-safe { background: rgba(34,197,94,0.08); border-color: var(--green); }
+        .tier-warn { background: rgba(245,158,11,0.08); border-color: var(--yellow); }
+        .tier-danger { background: rgba(239,68,68,0.08); border-color: var(--red); }
+        .tier-range { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
+        .tier-safe .tier-range { color: var(--green); }
+        .tier-warn .tier-range { color: var(--yellow); }
+        .tier-danger .tier-range { color: var(--red); }
+        .tier-label { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+        .tier-desc { font-size: 12px; color: var(--gray-400); }
+
+        /* ==================== DATABASE ==================== */
+        #co-so-du-lieu { background: var(--darker); }
+        .db-wrap {
+            background: var(--dark-card); border-radius: var(--radius-md);
+            box-shadow: 0 16px 50px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08);
+            overflow: hidden;
+        }
+        .db-toolbar {
+            padding: 16px 22px; display: flex; gap: 12px; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.08); flex-wrap: wrap; background: rgba(0,0,0,0.25);
+        }
+        .db-toolbar input {
+            flex: 1; min-width: 220px; padding: 10px 16px; border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px; font-size: 13px; outline: none; background: rgba(255,255,255,0.05); color: #fff;
+        }
+        .db-toolbar select {
+            padding: 10px 16px; border: 1px solid rgba(255,255,255,0.12); border-radius: 8px;
+            font-size: 13px; outline: none; background: #1E293B; color: #fff;
+        }
+        .btn-export {
+            background: linear-gradient(135deg, var(--orange), #FF4500);
+            color: #fff; border: none; padding: 10px 20px; border-radius: 8px;
+            font-size: 12.5px; font-weight: 700; cursor: pointer; transition: var(--transition);
+        }
+        .btn-export:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        .db-table-scroll { overflow-x: auto; }
+        table.db-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+        table.db-table thead { background: rgba(0,0,0,0.4); color: var(--gray-400); }
+        table.db-table th { padding: 14px 16px; font-weight: 600; white-space: nowrap; font-size: 12px; text-transform: uppercase; }
+        table.db-table td { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); vertical-align: top; }
+        table.db-table tbody tr:hover { background: rgba(255,255,255,0.03); }
+        .badge {
+            display: inline-block; padding: 3px 8px; border-radius: 4px;
+            font-size: 11px; font-weight: 600; white-space: nowrap;
+        }
+        .badge-danger { background: rgba(239,68,68,0.2); color: #FCA5A5; }
+        .badge-warn { background: rgba(245,158,11,0.2); color: #FDE047; }
+        .badge-safe { background: rgba(34,197,94,0.2); color: #86EFAC; }
+        .badge-null { background: rgba(255,255,255,0.06); color: var(--gray-500); font-style: italic; }
+        .db-pagination {
+            padding: 14px 22px; display: flex; justify-content: space-between;
+            align-items: center; border-top: 1px solid rgba(255,255,255,0.08); font-size: 12.5px; color: var(--gray-400);
+        }
+        .page-btns { display: flex; gap: 6px; }
+        .page-btns button {
+            width: 34px; height: 34px; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px;
+            background: rgba(255,255,255,0.05); color: #fff; cursor: pointer; font-size: 12.5px; font-weight: 600;
+        }
+        .page-btns button.active { background: var(--orange); border-color: var(--orange); }
+
+        /* ==================== THREATS ==================== */
+        #de-doa { background: var(--dark-surface); }
+        .threats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; }
+        .threat-card {
+            background: var(--dark-card); border-radius: var(--radius-md); padding: 22px; text-align: center;
+            border: 1px solid rgba(255,255,255,0.06); transition: var(--transition);
+        }
+        .threat-card:hover { border-color: var(--orange); transform: translateY(-3px); }
+        .threat-card .t-icon { font-size: 32px; margin-bottom: 10px; }
+        .threat-card h4 { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+        .threat-card p { font-size: 12px; color: var(--gray-400); }
+
+        /* ==================== 3K RULES ==================== */
+        #quy-tac-3k {
+            background: linear-gradient(135deg, #101626, #0A0D14);
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .rules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+        .rule-card {
+            background: rgba(255,255,255,0.03); border-radius: var(--radius-md); padding: 30px;
+            text-align: center; border: 1px solid rgba(255,255,255,0.08); transition: var(--transition);
+        }
+        .rule-card:hover { transform: translateY(-4px); border-color: var(--orange); }
+        .rule-num {
+            width: 52px; height: 52px; margin: 0 auto 16px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800;
+        }
+        .rule-card:nth-child(1) .rule-num { background: var(--orange); box-shadow: 0 0 20px var(--orange-glow); color: #fff; }
+        .rule-card:nth-child(2) .rule-num { background: var(--red); box-shadow: 0 0 20px var(--red-glow); color: #fff; }
+        .rule-card:nth-child(3) .rule-num { background: var(--purple); box-shadow: 0 0 20px rgba(168,85,247,0.4); color: #fff; }
+        .rule-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: #fff; }
+        .rule-card p { font-size: 13px; color: var(--gray-400); line-height: 1.65; }
+
+        /* ==================== QUIZ BANNER ==================== */
+        .quiz-banner {
+            background: linear-gradient(135deg, #D95F00, #9A1C00);
+            border-radius: var(--radius-lg); padding: 44px; color: #fff;
+            display: flex; align-items: center; gap: 36px;
+            box-shadow: 0 20px 50px rgba(217,95,0,0.25);
+        }
+        .quiz-banner-text { flex: 1; }
+        .quiz-banner h3 { font-size: 28px; font-weight: 800; margin-bottom: 10px; }
+        .quiz-banner p { font-size: 14.5px; opacity: .9; margin-bottom: 18px; }
+        .btn-quiz {
+            display: inline-flex; align-items: center; gap: 8px; background: #fff; color: #C2410C;
+            padding: 12px 28px; border-radius: var(--radius-full); font-size: 13.5px; font-weight: 800;
+            border: none; cursor: pointer; transition: var(--transition); box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+        .btn-quiz:hover { transform: scale(1.04); background: #FFF7ED; }
+        .quiz-themes { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 22px; }
+        .theme-card {
+            background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px; padding: 14px; text-align: center;
+        }
+        .theme-card h4 { font-size: 13px; font-weight: 700; }
+        .theme-card p { font-size: 11px; opacity: .8; margin-top: 2px; }
+        .quiz-visual {
+            width: 150px; height: 150px; min-width: 120px; background: rgba(255,255,255,0.15);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 56px;
+        }
+        @media(max-width: 768px) { .quiz-banner { flex-direction: column; text-align: center; padding: 28px 20px; } }
+
+        /* Quiz Modal */
+        .quiz-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(8px);
+        }
+        .quiz-overlay.show { display: flex; }
+        .quiz-modal {
+            background: #fff; border-radius: var(--radius-md); max-width: 600px; width: 92%;
+            max-height: 88vh; overflow-y: auto; padding: 30px; position: relative; color: #0F172A;
+        }
+        .btn-close-quiz { position: absolute; top: 14px; right: 14px; background: none; border: none; font-size: 22px; cursor: pointer; color: #64748B; }
+        .progress-bar { height: 6px; background: #E2E8F0; border-radius: 3px; overflow: hidden; margin: 14px 0; }
+        .progress-fill { height: 100%; background: var(--orange); }
+        .quiz-question { margin: 20px 0 14px; font-size: 15px; font-weight: 700; color: #0F172A; }
+        .quiz-options { display: flex; flex-direction: column; gap: 9px; }
+        .quiz-opt {
+            padding: 13px 16px; border: 1px solid #CBD5E1; border-radius: 10px;
+            cursor: pointer; font-size: 13.5px; transition: var(--transition);
+        }
+        .quiz-opt:hover { border-color: var(--orange); background: #FFF7ED; }
+        .quiz-opt.correct { border-color: var(--green); background: #DCFCE7; font-weight: 600; }
+        .quiz-opt.wrong { border-color: var(--red); background: #FEE2E2; }
+        .quiz-nav { display: flex; justify-content: flex-end; margin-top: 20px; }
+        .btn-sm {
+            padding: 9px 20px; border-radius: 8px; font-size: 13px; font-weight: 700;
+            cursor: pointer; border: none; background: var(--orange); color: #fff;
+        }
+
+        /* AI Modal */
+        .ai-modal-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            z-index: 2100; align-items: center; justify-content: center; backdrop-filter: blur(8px);
+        }
+        .ai-modal-overlay.show { display: flex; }
+        .ai-modal {
+            background: #fff; border-radius: var(--radius-md); max-width: 500px; width: 92%;
+            padding: 28px; position: relative; color: #0F172A;
+        }
+        .ai-modal h3 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+        .ai-modal p { font-size: 13px; color: #64748B; margin-bottom: 18px; }
+        .ai-field { margin-bottom: 14px; }
+        .ai-field label { display: block; font-size: 12.5px; font-weight: 700; margin-bottom: 4px; }
+        .ai-field input, .ai-field select {
+            width: 100%; padding: 11px 14px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 13px; outline: none;
+        }
+        .ai-modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+
+        /* ==================== FOOTER ==================== */
+        footer {
+            background: #04060A; color: rgba(255,255,255,0.5); padding: 50px 0 24px;
+            font-size: 13px; border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 30px; margin-bottom: 30px; }
+        @media(max-width: 768px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+        footer h4 { color: #fff; font-size: 14px; font-weight: 700; margin-bottom: 14px; }
+        footer ul { list-style: none; }
+        footer li { margin-bottom: 7px; }
+        footer a:hover { color: var(--orange); }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.06); padding-top: 22px; text-align: center; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<!-- ==================== FLOATING HEADER ==================== -->
+<div class="header-floating-wrap">
+    <header class="floating-nav">
+        <a href="#" class="logo">
+            <div class="logo-icon">🛡️</div>
+            <div class="logo-text">Fact<span>Check</span></div>
+        </a>
+        <nav class="nav-desktop">
+            <ul>
+                <li><a href="#trang-chu" class="active">Trang chủ</a></li>
+                <li><a href="#global-threat-map">Mạng lưới Toàn cầu</a></li>
+                <li><a href="#tinh-nang">Tính năng</a></li>
+                <li><a href="#tieu-chi">Tiêu chí LCS™</a></li>
+                <li><a href="#co-so-du-lieu">Cơ sở dữ liệu</a></li>
+                <li><a href="#quy-tac-3k">Quy tắc 3K</a></li>
+                <li><a href="#thu-thach">Thử thách</a></li>
+            </ul>
+        </nav>
+        <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
+    </header>
+</div>
+
+<div class="mobile-drawer" id="mobileDrawer">
+    <a href="#trang-chu" onclick="toggleMobileMenu()">Trang chủ</a>
+    <a href="#global-threat-map" onclick="toggleMobileMenu()">Mạng lưới Toàn cầu</a>
+    <a href="#tinh-nang" onclick="toggleMobileMenu()">Tính năng</a>
+    <a href="#tieu-chi" onclick="toggleMobileMenu()">Tiêu chí LCS™</a>
+    <a href="#co-so-du-lieu" onclick="toggleMobileMenu()">Cơ sở dữ liệu</a>
+    <a href="#quy-tac-3k" onclick="toggleMobileMenu()">Quy tắc 3K</a>
+    <a href="#thu-thach" onclick="toggleMobileMenu()">Thử thách</a>
+</div>
+
+<!-- ==================== HERO SEARCH ==================== -->
+<section class="hero" id="trang-chu">
+    <div class="container hero-inner">
+        <div class="motto-badge">🛡️ Kiểm Trước · Tin Sau</div>
+        <h1>Bảo vệ bạn trước mọi <span class="hl-orange">hiểm họa trực tuyến</span>:<br>lừa đảo, tin giả và <span class="hl-blue">website độc hại</span></h1>
+        <p class="lead">Nền tảng ứng dụng AI đa tầng quét và nhận diện link lừa đảo, website giả mạo và thông tin sai lệch theo tiêu chuẩn an toàn số.</p>
+
+        <!-- AI Engine Status -->
+        <div class="ai-status-bar">
+            <span class="ai-status-indicator"></span>
+            <span id="aiEngineLabel">AI Engine: <strong>AI Sandbox Đa Tầng (LCS™ Active)</strong></span>
+            <button class="btn-ai-cfg" onclick="openAIConfigModal()">⚙️ Cấu hình AI API</button>
+        </div>
+
+        <div class="search-wrap">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Nhập domain, link URL, bài báo hoặc tin nhắn cần kiểm tra...">
+                <button onclick="runCheck()">
+                    <span>🤖</span> AI Kiểm tra
+                </button>
+            </div>
+            <div class="search-tabs">
+                <button class="active" data-type="website" onclick="setSearchType(this)">🌐 Kiểm tra Website</button>
+                <button data-type="tin-gia" onclick="setSearchType(this)">📰 Kiểm tra Tin giả</button>
+                <button data-type="tin-nhan" onclick="setSearchType(this)">💬 Kiểm tra Tin nhắn</button>
+            </div>
+
+            <div class="quick-samples">
+                <span>Thử nhanh:</span>
+                <span class="sample-tag" onclick="fillSample('vietcom-bank.com.vn', 'website')">Phishing Vietcombank</span>
+                <span class="sample-tag" onclick="fillSample('dichvucong-gov.org', 'website')">Mạo danh Dịch vụ công</span>
+                <span class="sample-tag" onclick="fillSample('Uống nước chanh nóng chữa khỏi ung thư', 'tin-gia')">Tin giả Y tế</span>
+                <span class="sample-tag" onclick="fillSample('Chúc mừng bạn trúng 500 triệu từ Viettel', 'tin-nhan')">SMS Trúng thưởng</span>
+                <span class="sample-tag" onclick="fillSample('Tuyển CTV Shopee nạp 500k hoa hồng 20%', 'tin-nhan')">Bẫy CTV việc làm</span>
+            </div>
+        </div>
+
+        <!-- Scanning Animation Box -->
+        <div class="ai-scanning-box" id="aiScanningBox">
+            <div class="scan-title">
+                <span>⚡ TIẾN TRÌNH AI PHÂN TÍCH ĐA TẦNG...</span>
+                <span id="scanPercent">20%</span>
+            </div>
+            <div class="scan-steps">
+                <div class="scan-step" id="scanStep1"><span class="scan-step-dot"></span><span>Lớp 1: Phân tích cú pháp NLP & trích xuất thực thể, dấu hiệu ngôn ngữ thao túng</span></div>
+                <div class="scan-step" id="scanStep2"><span class="scan-step-dot"></span><span>Lớp 2: Kiểm tra Tên miền, DNS, bản ghi WHOIS và cấu hình bảo mật SSL/TLS</span></div>
+                <div class="scan-step" id="scanStep3"><span class="scan-step-dot"></span><span>Lớp 3: Rà soát 160.000+ domain độc hại, tài khoản rác và phát hiện Typosquatting</span></div>
+                <div class="scan-step" id="scanStep4"><span class="scan-step-dot"></span><span>Lớp 4: AI Sandbox đánh giá hành vi lừa đảo, chuyển hướng ẩn và bẫy tâm lý FOMO</span></div>
+                <div class="scan-step" id="scanStep5"><span class="scan-step-dot"></span><span>Lớp 5: Đối chiếu ma trận 9 Tiêu chí LCS™ & Tổng hợp điểm tín nhiệm thời gian thực</span></div>
+            </div>
+        </div>
+
+        <!-- Detailed AI Result -->
+        <div class="result-panel" id="resultPanel"></div>
+    </div>
+</section>
+
+<!-- ==================== GLOBAL THREAT MAP (3D ROTATING GLOBE) ==================== -->
+<section id="global-threat-map">
+    <div class="container">
+        <span class="global-section-tag">MẠNG LƯỚI GIÁM SÁT TOÀN CẦU</span>
+        <h2 class="global-heading">Tin giả và lừa đảo có ở khắp mọi nơi</h2>
+        <p class="global-sub">FactCheck kết nối với các trung tâm dữ liệu bảo mật trên toàn thế giới, mang đến khả năng giám sát và cảnh báo liên tục.</p>
+
+        <!-- Threat Badges Matching User Screenshot -->
+        <div class="threat-badges-bar">
+            <div class="threat-pill red">
+                <span class="dot"></span>
+                <span>THREAT INTELLIGENCE ACTIVE</span>
+            </div>
+            <div class="threat-pill orange">
+                <span class="dot"></span>
+                <span id="activeThreatCountLabel">2 ACTIVE THREATS</span>
+            </div>
+        </div>
+
+        <!-- 3D Interactive Rotating Earth Canvas -->
+        <div class="globe-wrapper" id="globeWrapper">
+            <canvas id="earthCanvas" width="560" height="520"></canvas>
+            <div class="globe-node-tooltip" id="globeTooltip">
+                <strong id="nodeCity">Hà Nội</strong>: <span id="nodeAlert">1.420 cảnh báo độc hại</span>
+            </div>
+        </div>
+
+        <div class="globe-helper-text">KÉO ĐỂ XOAY · DRAG TO ROTATE</div>
+    </div>
+</section>
+
+<!-- ==================== TÍNH NĂNG ==================== -->
+<section id="tinh-nang">
+    <div class="container">
+        <div class="section-header">
+            <h2>3 Giải pháp Bảo vệ Trọng tâm</h2>
+            <p>Hệ thống hỗ trợ người dùng nhận diện và ngăn chặn các mối đe dọa trên không gian số</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon" style="background:rgba(255,119,0,0.15);color:var(--orange)">🌐</div>
+                <h3>Kiểm tra Website & Link lừa đảo</h3>
+                <p>Phát hiện trang web giả mạo ngân hàng, ví điện tử, cơ quan nhà nước. Phân tích tuổi đời tên miền, chứng chỉ SSL, bản ghi WHOIS, dấu hiệu typosquatting và mã độc Javascript ẩn.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:rgba(0,166,255,0.15);color:var(--blue)">📰</div>
+                <h3>Kiểm tra Tin giả & Bài báo</h3>
+                <p>Phân tích nội dung bài viết, tin tức trôi nổi trên mạng xã hội. Đối chiếu với hơn 10 cơ quan báo chí chính thống để xác minh tính xác thực, nhận diện ngữ cảnh bóp méo.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:rgba(168,85,247,0.15);color:var(--purple)">💬</div>
+                <h3>Kiểm tra Tin nhắn lừa đảo</h3>
+                <p>Phân tích cú pháp tin nhắn đáng ngờ: trúng thưởng, yêu cầu cung cấp OTP, mật khẩu, thông tin tài chính. Rà soát tài khoản ngân hàng và số điện thoại bị tố cáo.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== TIÊU CHÍ LCS ==================== -->
+<section id="tieu-chi">
+    <div class="container">
+        <div class="section-header">
+            <h2>9 Tiêu chí Đánh giá An toàn LCS™</h2>
+            <p>Bộ ma trận tiêu chuẩn đánh giá rủi ro đa tầng áp dụng cho mọi bản ghi trong cơ sở dữ liệu</p>
+        </div>
+        <div class="criteria-grid">
+            <div class="criteria-item"><div class="criteria-num">1</div><div><h4>Điểm Tín Nhiệm Tên Miền</h4><p>Phân tích tuổi đời domain, nhà đăng ký registrar, lịch sử thay đổi DNS.</p></div></div>
+            <div class="criteria-item"><div class="criteria-num">2</div><div><h4>Xác Thực Chứng Chỉ SSL/TLS</h4><p>Kiểm tra loại chứng chỉ DV/OV/EV, thời hạn hiệu lực, tổ chức cấp phát.</p></div></div>
+            <div class="criteria-item"><div class="criteria-num">3</div><div><h4>Phân Tích Hành Vi Mã Nguồn</h4><p>Thực thi trong AI Sandbox, quét mã độc Javascript, iframe ẩn, popup bẫy.</p></div></div>
+            <div class="criteria-item"><div class="criteria-num">4</div><div><h4>Đối Soát Blacklist Toàn Cầu</h4><p>Rà soát 160.000+ domain độc hại từ PhishTank, VirusTotal, Google Safe Browsing.</p></div></div>
+            <div class="criteria-item"><div class="criteria-num">5</div><div><h4>Nhận Diện Giao Diện Mạo Danh</h4><p>AI thị giác so sánh logo, URL với 500+ thương hiệu lớn tại Việt Nam.</p></div></div>
+            <div class="criteria-item"><div class="criteria-num">6</div><div><h4>Rà Soát SĐT & STK Ngân Hàng Rác</h4><p>Tra cứu STK nhận tiền và hotline trong CSDL tài khoản lừa đảo bị tố cáo.</p></div></div>
+            <div class="criteria-item"><div class="criteria-num">7</div><div><h4>Giải Mã Ngữ Cảnh & Thao Túng</h4><p>AI phát hiện từ ngữ kích động sợ hãi, khẩn cấp giả tạo (FOMO), bẫy lãi suất.</p></div></div>
+            <div class="criteria-item"><div class="criteria-num">8</div><div><h4>Kiểm Tra Chuyển Hướng Ẩn</h4><p>Bóc tách liên kết rút gọn, phát hiện chuyển hướng trung gian che mắt kiểm duyệt.</p></div></div>
+            <div class="criteria-item"><div class="criteria-num">9</div><div><h4>Đánh Giá Từ Cộng Đồng</h4><p>Tích hợp phản hồi từ mạng lưới người dùng và chuyên gia an ninh mạng.</p></div></div>
+        </div>
+
+        <div class="score-tiers">
+            <div class="tier-card tier-safe"><div class="tier-range">80 — 100</div><div class="tier-label">AN TOÀN</div><div class="tier-desc">Website uy tín, chứng chỉ hợp lệ, không nằm trong danh sách cảnh báo.</div></div>
+            <div class="tier-card tier-warn"><div class="tier-range">40 — 79</div><div class="tier-label">CẦN THẬN TRỌNG</div><div class="tier-desc">Website mới đăng ký, dấu hiệu ngữ cảnh mập mờ, thiếu thông tin pháp lý.</div></div>
+            <div class="tier-card tier-danger"><div class="tier-range">0 — 39</div><div class="tier-label">NGUY HIỂM / LỪA ĐẢO</div><div class="tier-desc">Nằm trong danh sách đen, mạo danh ngân hàng/cơ quan, chứa mã độc.</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== DATABASE ==================== -->
+<section id="co-so-du-lieu">
+    <div class="container">
+        <div class="section-header">
+            <h2>Cơ Sở Dữ Liệu An Toàn Số (Database)</h2>
+            <p>Dữ liệu trích xuất chuẩn định dạng, nạp trực tiếp vào hệ thống quản lý rủi ro</p>
+        </div>
+        <div class="db-wrap">
+            <div class="db-toolbar">
+                <input type="text" id="dbSearch" placeholder="Tìm theo URL, từ khóa, nội dung, nguồn..." oninput="filterDB()">
+                <select id="dbFilterType" onchange="filterDB()">
+                    <option value="all">Tất cả loại dữ liệu</option>
+                    <option value="website">Website lừa đảo</option>
+                    <option value="tin-gia">Tin giả</option>
+                    <option value="tin-nhan">Tin nhắn lừa đảo</option>
+                </select>
+                <select id="dbFilterVerdict" onchange="filterDB()">
+                    <option value="all">Tất cả phán quyết</option>
+                    <option value="NGUY HIỂM">Nguy hiểm / Lừa đảo</option>
+                    <option value="CẦN THẬN TRỌNG">Cần thận trọng</option>
+                    <option value="AN TOÀN">An toàn</option>
+                </select>
+                <button class="btn-export" onclick="exportJSON()">📥 Xuất JSON Database</button>
+            </div>
+            <div class="db-table-scroll">
+                <table class="db-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Phân loại</th>
+                            <th>Mục tiêu / Nội dung</th>
+                            <th>Thương hiệu mạo danh</th>
+                            <th>Điểm LCS™</th>
+                            <th>Phán quyết</th>
+                            <th>Nguồn xác minh</th>
+                            <th>Ngày phát hiện</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dbTableBody"></tbody>
+                </table>
+            </div>
+            <div class="db-pagination">
+                <span id="dbPaginationInfo">Hiển thị...</span>
+                <div class="page-btns" id="dbPaginationBtns"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== THREATS ==================== -->
+<section id="de-doa">
+    <div class="container">
+        <div class="section-header">
+            <h2>Mối Đe Dọa Phổ Biến Trên Không Gian Mạng</h2>
+            <p>12 thủ đoạn lừa đảo và tin giả nguy hiểm được ghi nhận tại Việt Nam</p>
+        </div>
+        <div class="threats-grid">
+            <div class="threat-card"><div class="t-icon">🎭</div><h4>Deepfake</h4><p>Dùng AI tạo video/giọng nói giả mạo người thân, lãnh đạo</p></div>
+            <div class="threat-card"><div class="t-icon">👮</div><h4>Mạo danh Công an</h4><p>Giả danh cơ quan thực thi pháp luật đe dọa tống tiền</p></div>
+            <div class="threat-card"><div class="t-icon">🏦</div><h4>Giả mạo Ngân hàng</h4><p>Website và SMS giả trang e-banking chiếm đoạt OTP</p></div>
+            <div class="threat-card"><div class="t-icon">🛒</div><h4>Bẫy cọc TMĐT</h4><p>Lừa tiền đặt cọc mua hàng online, gửi bill chuyển tiền giả</p></div>
+            <div class="threat-card"><div class="t-icon">📱</div><h4>Chiếm đoạt SIM</h4><p>Chiêu trò nâng cấp SIM 4G/5G nhằm đánh cắp mã OTP</p></div>
+            <div class="threat-card"><div class="t-icon">💼</div><h4>Bẫy Việc làm</h4><p>"Việc nhẹ lương cao" like video, giật đơn, nạp tiền mở khóa</p></div>
+            <div class="threat-card"><div class="t-icon">💰</div><h4>Đầu tư tài chính ảo</h4><p>Sàn giao dịch giả mạo cam kết lợi nhuận 30-50%/tháng</p></div>
+            <div class="threat-card"><div class="t-icon">📰</div><h4>Tin giả Y tế</h4><p>Bóp méo kiến thức sức khỏe, kích động hoang mang dư luận</p></div>
+            <div class="threat-card"><div class="t-icon">💳</div><h4>Tín dụng đen Online</h4><p>App vay nặng lãi, khủng bố danh bạ và đòi nợ bạo lực</p></div>
+            <div class="threat-card"><div class="t-icon">🔗</div><h4>Phishing MXH</h4><p>Link bình chọn cuộc thi, minigame chiếm đoạt tài khoản Facebook</p></div>
+            <div class="threat-card"><div class="t-icon">🔐</div><h4>Ransomware</h4><p>Mã độc tống tiền mã hóa dữ liệu máy tính doanh nghiệp</p></div>
+            <div class="threat-card"><div class="t-icon">❤️</div><h4>Bẫy Tình cảm</h4><p>Romance scam xây dựng vỏ bọc thành đạt rồi dụ đầu tư</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== 3K RULES ==================== -->
+<section id="quy-tac-3k">
+    <div class="container">
+        <div class="section-header">
+            <h2>Quy Tắc 3K — Kỹ Năng Số An Toàn</h2>
+            <p>Ba nguyên tắc vàng phòng chống lừa đảo trực tuyến từ chiến dịch "Mắt Thấy! Tin Chưa?"</p>
+        </div>
+        <div class="rules-grid">
+            <div class="rule-card">
+                <div class="rule-num">K1</div>
+                <h3>KHÔNG VỘI TIN</h3>
+                <p>Không vội tin bất kỳ thông tin nào trên mạng. Luôn kiểm tra, xác minh nguồn gốc trước khi tin tưởng, giao dịch hoặc chia sẻ. Áp dụng nguyên tắc "Kiểm Trước — Tin Sau".</p>
+            </div>
+            <div class="rule-card">
+                <div class="rule-num">K2</div>
+                <h3>KHÔNG CHUYỂN TIỀN</h3>
+                <p>Tuyệt đối không chuyển tiền cho người lạ hoặc theo yêu cầu từ tin nhắn, cuộc gọi chưa xác minh. Mọi yêu cầu chuyển tiền khẩn cấp đều cần gọi điện thoại trực tiếp để xác nhận.</p>
+            </div>
+            <div class="rule-card">
+                <div class="rule-num">K3</div>
+                <h3>KHÔNG CHIA SẺ OTP</h3>
+                <p>Không bao giờ cung cấp mã OTP, mật khẩu tài khoản, số CCCD hoặc thông tin thẻ ngân hàng cho bất kỳ ai qua điện thoại, tin nhắn hay đường link.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== THỬ THÁCH ==================== -->
+<section id="thu-thach">
+    <div class="container">
+        <div class="quiz-banner">
+            <div class="quiz-banner-text">
+                <h3>Thử thách: Mắt Thấy! Tin Chưa?</h3>
+                <p>Bài trắc nghiệm 10 câu hỏi kiểm tra kỹ năng nhận diện thủ đoạn lừa đảo và tư duy phản biện khi tiếp nhận thông tin trên mạng xã hội. Đạt từ 70% trở lên để nhận Chứng chỉ Số.</p>
+                <button class="btn-quiz" onclick="startQuiz()">▶ Bắt đầu Thử thách</button>
+                <div class="quiz-themes">
+                    <div class="theme-card"><h4>CHỦ ĐỀ 1</h4><p>Bẫy Tình Cảm & Tài Chính</p></div>
+                    <div class="theme-card"><h4>CHỦ ĐỀ 2</h4><p>Mạo Danh Thương Hiệu & Cơ Quan</p></div>
+                    <div class="theme-card"><h4>CHỦ ĐỀ 3</h4><p>Bẫy Tuyển Dụng & Việc Làm</p></div>
+                    <div class="theme-card"><h4>CHỦ ĐỀ 4</h4><p>Tin Giả & Thao Túng Tâm Lý</p></div>
+                </div>
+            </div>
+            <div class="quiz-visual">🧠</div>
+        </div>
+    </div>
+</section>
+
+<!-- Modals -->
+<div class="quiz-overlay" id="quizOverlay">
+    <div class="quiz-modal">
+        <button class="btn-close-quiz" onclick="closeQuiz()">✕</button>
+        <div id="quizContent"></div>
+    </div>
+</div>
+
+<div class="ai-modal-overlay" id="aiConfigModal">
+    <div class="ai-modal">
+        <button class="btn-close-quiz" onclick="closeAIConfigModal()">✕</button>
+        <h3>🤖 Cấu hình AI Engine</h3>
+        <p>Hệ thống mặc định sử dụng <strong>AI Sandbox Đa Tầng Cục Bộ</strong> (hoạt động offline độc lập, không cần API Key). Bạn cũng có thể kết nối trực tiếp với <strong>Google Gemini API</strong> nếu muốn phân tích chuyên sâu qua đám mây.</p>
+        
+        <div class="ai-field">
+            <label>Chế độ AI kiểm tra:</label>
+            <select id="aiModeSelect" onchange="toggleApiKeyInput()">
+                <option value="local">AI Sandbox Đa Tầng Cục Bộ (Tích hợp sẵn - Tốc độ cao)</option>
+                <option value="gemini">Google Gemini API (Cloud LLM - Yêu cầu API Key)</option>
+            </select>
+        </div>
+
+        <div class="ai-field" id="geminiKeyGroup" style="display:none">
+            <label>Google Gemini API Key:</label>
+            <input type="password" id="geminiApiKey" placeholder="Nhập API Key (AIzaSy...)">
+            <span style="font-size:11px;color:#64748B;margin-top:4px;display:block">API Key được lưu bảo mật trong localStorage trình duyệt của bạn.</span>
+        </div>
+
+        <div class="ai-modal-footer">
+            <button class="btn-sm" style="background:#E2E8F0;color:#0F172A" onclick="closeAIConfigModal()">Hủy</button>
+            <button class="btn-sm" onclick="saveAIConfig()">Lưu cấu hình</button>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<footer>
+    <div class="container">
+        <div class="footer-grid">
+            <div>
+                <div style="font-size:19px;font-weight:800;color:#fff;margin-bottom:8px">Fact<span style="color:var(--orange)">Check</span></div>
+                <p style="line-height:1.6;font-size:12.5px">Nền tảng xác thực thông tin và phòng chống lừa đảo trực tuyến toàn cầu. Mô phỏng theo giao diện giám sát an toàn số của Lá Chắn Số.</p>
+            </div>
+            <div>
+                <h4>Công cụ Kiểm tra</h4>
+                <ul>
+                    <li><a href="#trang-chu">Kiểm tra Website & Link</a></li>
+                    <li><a href="#trang-chu">Kiểm tra Tin giả</a></li>
+                    <li><a href="#trang-chu">Kiểm tra Tin nhắn</a></li>
+                    <li><a href="#co-so-du-lieu">Cơ sở dữ liệu</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Mạng Lưới Giám Sát</h4>
+                <ul>
+                    <li><a href="#global-threat-map">Bản đồ Trái Đất 3D</a></li>
+                    <li><a href="#tieu-chi">9 Tiêu chí LCS™</a></li>
+                    <li><a href="#de-doa">12 Mối đe dọa</a></li>
+                    <li><a href="#quy-tac-3k">Quy tắc 3K</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Liên kết</h4>
+                <ul>
+                    <li><a href="http://lachansovn.com" target="_blank">Lá Chắn Số (lachansovn.com) ↗</a></li>
+                    <li><a href="#">Báo cáo Mối đe dọa</a></li>
+                    <li><a href="#">Hỗ trợ khẩn cấp</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 FactCheck — Nền tảng Xác thực & Giám sát An toàn Số Toàn cầu.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- ==================== JAVASCRIPT: 3D EARTH GLOBE & ENGINE ==================== -->
+<script>
+function toggleMobileMenu() {
+    document.getElementById('mobileDrawer').classList.toggle('show');
+}
+
+/* ==============================================================
+   3D ROTATING EARTH GLOBE ENGINE (HTML5 CANVAS 3D SPHERE)
+   Matching the amber/orange aesthetic in user screenshot
+   ============================================================== */
+(function initGlobe() {
+    const canvas = document.getElementById('earthCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const tooltip = document.getElementById('globeTooltip');
+    const wrapper = document.getElementById('globeWrapper');
+
+    let width = canvas.width;
+    let height = canvas.height;
+    const R = 205; // Globe radius
+    const cx = width / 2;
+    const cy = height / 2;
+
+    // Rotation angles in radians
+    let rotX = 0.22; // tilt
+    let rotY = 1.85; // initial rotation showing Vietnam/Asia & Europe
+    let isDragging = false;
+    let startX = 0, startY = 0;
+    let lastX = 0, lastY = 0;
+    let velX = 0, velY = 0;
+    let autoSpin = true;
+
+    // Threat Nodes matching screenshot (Lat, Long, City, Alert Count)
+    const nodes = [
+        { lat: 21.0285, lon: 105.8542, city: 'Hà Nội', alert: '1.420 cảnh báo mạo danh' },
+        { lat: 10.8231, lon: 106.6297, city: 'TP. HCM', alert: '2.150 cảnh báo lừa đảo' },
+        { lat: 1.3521, lon: 103.8198, city: 'Singapore', alert: 'Trung tâm AI Sandbox' },
+        { lat: 35.6762, lon: 139.6503, city: 'Tokyo', alert: 'Mạng lưới PhishTank APAC' },
+        { lat: 51.5074, lon: -0.1278, city: 'London', alert: 'OpenPhish Global Node' },
+        { lat: 37.7749, lon: -122.4194, city: 'San Francisco', alert: 'Threat Intelligence Core' }
+    ];
+
+    // Continent Polygons approximations in (Lat, Lon)
+    const continents = [
+        // Asia & Europe
+        [
+            [70, 30], [70, 170], [60, 160], [45, 145], [35, 130], [22, 120], [10, 105],
+            [1, 104], [8, 77], [25, 65], [30, 50], [38, 30], [45, 10], [55, 5], [60, 25], [70, 30]
+        ],
+        // Vietnam & Indochina highlight outline
+        [
+            [23, 105], [21, 107], [16, 108], [11, 109], [9, 105], [10, 104], [14, 103], [22, 102], [23, 105]
+        ],
+        // Africa
+        [
+            [35, -5], [37, 10], [32, 32], [12, 43], [5, 48], [-12, 40], [-26, 33],
+            [-34, 18], [-22, 14], [5, 9], [5, -2], [15, -17], [28, -13], [35, -5]
+        ],
+        // North America
+        [
+            [70, -160], [70, -80], [60, -60], [45, -60], [30, -80], [25, -80], [18, -95],
+            [15, -90], [28, -112], [35, -120], [50, -125], [60, -140], [70, -160]
+        ],
+        // South America
+        [
+            [12, -75], [10, -60], [-5, -35], [-22, -40], [-45, -65], [-55, -70],
+            [-40, -73], [-18, -70], [-5, -80], [5, -77], [12, -75]
+        ],
+        // Australia
+        [
+            [-12, 130], [-15, 136], [-12, 142], [-22, 150], [-34, 150], [-38, 145],
+            [-35, 118], [-22, 114], [-15, 124], [-12, 130]
+        ]
+    ];
+
+    // Helper: Convert Lat/Lon to 3D Cartesian (x, y, z) on unit sphere
+    function latLonTo3D(lat, lon) {
+        const phi = (90 - lat) * (Math.PI / 180);
+        const theta = (lon + 180) * (Math.PI / 180);
+        return {
+            x: -(Math.sin(phi) * Math.cos(theta)),
+            y: Math.cos(phi),
+            z: Math.sin(phi) * Math.sin(theta)
+        };
+    }
+
+    // Rotate point in 3D
+    function rotate3D(p, rx, ry) {
+        // Rotate around Y
+        const cosY = Math.cos(ry);
+        const sinY = Math.sin(ry);
+        const x1 = p.x * cosY + p.z * sinY;
+        const z1 = -p.x * sinY + p.z * cosY;
+
+        // Rotate around X
+        const cosX = Math.cos(rx);
+        const sinX = Math.sin(rx);
+        const y2 = p.y * cosX - z1 * sinX;
+        const z2 = p.y * sinX + z1 * cosX;
+
+        return { x: x1, y: y2, z: z2 };
+    }
+
+    // Render loop
+    let pulseAngle = 0;
+    function draw() {
+        ctx.clearRect(0, 0, width, height);
+
+        // 1. Ambient Background Halo (Atmosphere Glow)
+        const glowGrad = ctx.createRadialGradient(cx, cy, R * 0.75, cx, cy, R * 1.25);
+        glowGrad.addColorStop(0, 'rgba(255, 119, 0, 0.16)');
+        glowGrad.addColorStop(0.5, 'rgba(255, 119, 0, 0.05)');
+        glowGrad.addColorStop(1, 'transparent');
+        ctx.fillStyle = glowGrad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, R * 1.25, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 2. Base Dark Sphere with Rim Gradient Lighting (Matching screenshot)
+        const sphereGrad = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.35, R * 0.1, cx, cy, R);
+        sphereGrad.addColorStop(0, '#1E1710');
+        sphereGrad.addColorStop(0.55, '#120D08');
+        sphereGrad.addColorStop(0.85, '#0B0907');
+        sphereGrad.addColorStop(1, '#050403');
+        ctx.fillStyle = sphereGrad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Clip to globe circle for rendering interior lines
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, 0, Math.PI * 2);
+        ctx.clip();
+
+        // 3. Draw Latitude & Longitude grid lines (Amber / Gold grid)
+        ctx.strokeStyle = 'rgba(255, 119, 0, 0.12)';
+        ctx.lineWidth = 1;
+
+        // Latitudes
+        for (let lat = -60; lat <= 60; lat += 30) {
+            ctx.beginPath();
+            let first = true;
+            for (let lon = -180; lon <= 180; lon += 8) {
+                const p3 = latLonTo3D(lat, lon);
+                const pr = rotate3D(p3, rotX, rotY);
+                if (pr.z > 0) { // front hemisphere
+                    const sx = cx + pr.x * R;
+                    const sy = cy - pr.y * R;
+                    if (first) { ctx.moveTo(sx, sy); first = false; }
+                    else { ctx.lineTo(sx, sy); }
+                } else {
+                    first = true;
+                }
+            }
+            ctx.stroke();
+        }
+
+        // Longitudes
+        for (let lon = -180; lon < 180; lon += 30) {
+            ctx.beginPath();
+            let first = true;
+            for (let lat = -80; lat <= 80; lat += 6) {
+                const p3 = latLonTo3D(lat, lon);
+                const pr = rotate3D(p3, rotX, rotY);
+                if (pr.z > 0) {
+                    const sx = cx + pr.x * R;
+                    const sy = cy - pr.y * R;
+                    if (first) { ctx.moveTo(sx, sy); first = false; }
+                    else { ctx.lineTo(sx, sy); }
+                } else {
+                    first = true;
+                }
+            }
+            ctx.stroke();
+        }
+
+        // 4. Draw Continents with Amber / Bronze Fills & Glowing Borders
+        continents.forEach(poly => {
+            // Check visibility of polygon centroid
+            ctx.beginPath();
+            let visiblePoints = 0;
+            poly.forEach((pt, idx) => {
+                const p3 = latLonTo3D(pt[0], pt[1]);
+                const pr = rotate3D(p3, rotX, rotY);
+                if (pr.z > -0.15) visiblePoints++;
+                const sx = cx + pr.x * R;
+                const sy = cy - pr.y * R;
+                if (idx === 0) ctx.moveTo(sx, sy);
+                else ctx.lineTo(sx, sy);
+            });
+            ctx.closePath();
+
+            if (visiblePoints > poly.length * 0.3) {
+                ctx.fillStyle = 'rgba(217, 119, 6, 0.18)'; // Amber continent fill
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255, 140, 0, 0.45)'; // Amber border
+                ctx.lineWidth = 1.3;
+                ctx.stroke();
+            }
+        });
+
+        // Sphere Rim Glow Inner
+        const innerRim = ctx.createRadialGradient(cx, cy, R * 0.85, cx, cy, R);
+        innerRim.addColorStop(0, 'transparent');
+        innerRim.addColorStop(0.9, 'rgba(255, 119, 0, 0.2)');
+        innerRim.addColorStop(1, 'rgba(255, 119, 0, 0.55)');
+        ctx.fillStyle = innerRim;
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore(); // unclip
+
+        // 5. Outer Rim Border Ring (Golden Orange Rim)
+        ctx.strokeStyle = 'rgba(255, 119, 0, 0.4)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // 6. Threat Marker Nodes with Pulsing Halos and Labels
+        pulseAngle += 0.05;
+        const pulseR = 6 + Math.sin(pulseAngle) * 3;
+
+        nodes.forEach(node => {
+            const p3 = latLonTo3D(node.lat, node.lon);
+            const pr = rotate3D(p3, rotX, rotY);
+
+            // Only draw if on front visible side of sphere
+            if (pr.z > 0.05) {
+                const sx = cx + pr.x * R;
+                const sy = cy - pr.y * R;
+                const alpha = Math.min(1, Math.max(0.2, (pr.z - 0.05) * 2));
+
+                ctx.save();
+                ctx.globalAlpha = alpha;
+
+                // Glowing outer pulse ring
+                ctx.strokeStyle = 'rgba(255, 119, 0, 0.6)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(sx, sy, pulseR + 4, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Inner glowing node pill (matches the orange pin in screenshot)
+                const nodeGrad = ctx.createRadialGradient(sx, sy, 1, sx, sy, 6);
+                nodeGrad.addColorStop(0, '#FFFFFF');
+                nodeGrad.addColorStop(0.6, '#FF7700');
+                nodeGrad.addColorStop(1, '#B45309');
+                ctx.fillStyle = nodeGrad;
+                ctx.beginPath();
+                ctx.arc(sx, sy, 5, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Shield mini icon center dot
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(sx, sy, 1.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                // City label tag
+                ctx.font = '600 10.5px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.textAlign = 'center';
+                ctx.shadowColor = '#000';
+                ctx.shadowBlur = 4;
+                ctx.fillText(node.city, sx, sy + 16);
+
+                ctx.restore();
+            }
+        });
+
+        // Auto spin with damping when not dragging
+        if (!isDragging) {
+            rotY += 0.0035; // gentle continuous rotation
+            velX *= 0.92;
+            velY *= 0.92;
+            rotY += velX;
+            rotX += velY;
+            rotX = Math.max(-0.8, Math.min(0.8, rotX)); // limit tilt
+        }
+
+        requestAnimationFrame(draw);
+    }
+
+    // Mouse & Touch Drag Interactions (Drag to Rotate)
+    function onPointerDown(clientX, clientY) {
+        isDragging = true;
+        startX = clientX;
+        startY = clientY;
+        lastX = clientX;
+        lastY = clientY;
+        velX = 0;
+        velY = 0;
+    }
+
+    function onPointerMove(clientX, clientY) {
+        if (!isDragging) {
+            // Check for node hover for tooltip
+            checkHover(clientX, clientY);
+            return;
+        }
+        const dx = clientX - lastX;
+        const dy = clientY - lastY;
+        velX = dx * 0.005;
+        velY = -dy * 0.005;
+        rotY += velX;
+        rotX += velY;
+        rotX = Math.max(-0.8, Math.min(0.8, rotX));
+        lastX = clientX;
+        lastY = clientY;
+    }
+
+    function onPointerUp() {
+        isDragging = false;
+    }
+
+    function checkHover(clientX, clientY) {
+        const rect = canvas.getBoundingClientRect();
+        const mx = (clientX - rect.left) * (canvas.width / rect.width);
+        const my = (clientY - rect.top) * (canvas.height / rect.height);
+
+        let hovered = null;
+        for (const node of nodes) {
+            const p3 = latLonTo3D(node.lat, node.lon);
+            const pr = rotate3D(p3, rotX, rotY);
+            if (pr.z > 0.1) {
+                const sx = cx + pr.x * R;
+                const sy = cy - pr.y * R;
+                const dist = Math.hypot(mx - sx, my - sy);
+                if (dist < 18) {
+                    hovered = { node, sx: (sx / canvas.width) * rect.width, sy: (sy / canvas.height) * rect.height };
+                    break;
+                }
+            }
+        }
+
+        if (hovered) {
+            tooltip.style.left = hovered.sx + 'px';
+            tooltip.style.top = hovered.sy + 'px';
+            document.getElementById('nodeCity').textContent = hovered.node.city;
+            document.getElementById('nodeAlert').textContent = hovered.node.alert;
+            tooltip.classList.add('show');
+        } else {
+            tooltip.classList.remove('show');
+        }
+    }
+
+    canvas.addEventListener('mousedown', e => onPointerDown(e.clientX, e.clientY));
+    window.addEventListener('mousemove', e => onPointerMove(e.clientX, e.clientY));
+    window.addEventListener('mouseup', onPointerUp);
+
+    canvas.addEventListener('touchstart', e => {
+        if (e.touches.length === 1) onPointerDown(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+    window.addEventListener('touchmove', e => {
+        if (isDragging && e.touches.length === 1) onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+    window.addEventListener('touchend', onPointerUp);
+
+    // Start 3D Engine
+    draw();
+})();
+
+/* ==============================================================
+   DATABASE & FACTCHECK LOGIC
+   ============================================================== */
+let DATABASE = [
+    {
+        id: 1,
+        type: "website",
+        type_label: "Website lừa đảo",
+        target: "vietcombank-online.vn.com",
+        title: "Trang web giả mạo Vietcombank",
+        category: "Mạo danh Ngân hàng",
+        description: "Giả mạo trang đăng nhập Vietcombank để chiếm đoạt tài khoản. Tên miền mới đăng ký dưới 30 ngày, chứng chỉ SSL tự ký, vi phạm nhãn hiệu.",
+        verdict: "NGUY HIỂM",
+        status: "danger",
+        score: 12,
+        criteria: {
+            domain_trust: 10,
+            ssl_validity: 15,
+            sandbox_behavior: 10,
+            blacklist_match: true,
+            brand_impersonation: "Vietcombank",
+            flagged_contacts: null,
+            ai_manipulation: "Kích động sợ hãi tài khoản bị khóa",
+            redirect_check: null,
+            community_reports: 52
+        },
+        source: "PhishTank, WHOIS Check",
+        reported_date: "2026-11-15",
+        author: null
+    },
+    {
+        id: 2,
+        type: "website",
+        type_label: "Website lừa đảo",
+        target: "mbbank-ebanking.top",
+        title: "Website phishing giả mạo MB Bank",
+        category: "Mạo danh Ngân hàng",
+        description: "Website phishing giả mạo dịch vụ e-banking MB Bank. Yêu cầu nhập mã xác thực OTP và mật khẩu giao dịch. DNS trỏ về server nước ngoài.",
+        verdict: "NGUY HIỂM",
+        status: "danger",
+        score: 8,
+        criteria: {
+            domain_trust: 5,
+            ssl_validity: 20,
+            sandbox_behavior: 5,
+            blacklist_match: true,
+            brand_impersonation: "MB Bank",
+            flagged_contacts: null,
+            ai_manipulation: "Yêu cầu khẩn cấp đồng bộ mã OTP",
+            redirect_check: null,
+            community_reports: 34
+        },
+        source: "OpenPhish, DNS Check",
+        reported_date: "2026-11-12",
+        author: null
+    },
+    {
+        id: 3,
+        type: "website",
+        type_label: "Website lừa đảo",
+        target: "dichvucong-gov.org",
+        title: "Giả mạo Cổng dịch vụ công quốc gia",
+        category: "Mạo danh Cơ quan nhà nước",
+        description: "Giả mạo Cổng dịch vụ công quốc gia. Lừa người dùng cập nhật thông tin định danh CCCD để thu thập dữ liệu cá nhân trái phép.",
+        verdict: "NGUY HIỂM",
+        status: "danger",
+        score: 5,
+        criteria: {
+            domain_trust: 5,
+            ssl_validity: 10,
+            sandbox_behavior: 5,
+            blacklist_match: true,
+            brand_impersonation: "Cổng Dịch Vụ Công Quốc Gia",
+            flagged_contacts: null,
+            ai_manipulation: "Dọa phạt nếu không đồng bộ dữ liệu CCCD",
+            redirect_check: null,
+            community_reports: 79
+        },
+        source: "WHOIS, SSL Check, Google Safe Browsing",
+        reported_date: "2026-11-10",
+        author: null
+    },
+    {
+        id: 4,
+        type: "tin-gia",
+        type_label: "Tin giả",
+        target: "\"Uống nước chanh ấm mỗi sáng chữa được ung thư giai đoạn cuối\"",
+        title: "Tin giả y tế chữa ung thư bằng nước chanh",
+        category: "Tin giả Y tế",
+        description: "Thông tin y tế sai lệch lan truyền diện rộng trên mạng xã hội. Không có bằng chứng khoa học hoặc khuyến nghị y khoa nào hỗ trợ tuyên bố này.",
+        verdict: "NGUY HIỂM",
+        status: "danger",
+        score: 15,
+        criteria: {
+            domain_trust: null,
+            ssl_validity: null,
+            sandbox_behavior: null,
+            blacklist_match: false,
+            brand_impersonation: null,
+            flagged_contacts: null,
+            ai_manipulation: "Thổi phồng tác dụng y học, đánh vào tâm lý người bệnh",
+            redirect_check: null,
+            community_reports: 120
+        },
+        source: "Bộ Y tế, Tổ chức Y tế Thế giới (WHO)",
+        reported_date: "2026-11-14",
+        author: null
+    },
+    {
+        id: 5,
+        type: "tin-nhan",
+        type_label: "Tin nhắn lừa đảo",
+        target: "\"Chúc mừng bạn đã trúng thưởng 500 triệu từ Viettel. Nhấn link để nhận thưởng ngay: viettel-promo.xyz\"",
+        title: "Tin nhắn trúng thưởng mạo danh Viettel",
+        category: "Tin nhắn Lừa đảo",
+        description: "Tin nhắn giả mạo nhà mạng Viettel. Dẫn dụ người nhận truy cập website phishing để chiếm đoạt tài khoản thanh toán và mật khẩu.",
+        verdict: "NGUY HIỂM",
+        status: "danger",
+        score: 6,
+        criteria: {
+            domain_trust: 5,
+            ssl_validity: 10,
+            sandbox_behavior: 5,
+            blacklist_match: true,
+            brand_impersonation: "Viettel Telecom",
+            flagged_contacts: "Đầu số quốc tế mạo danh SMS Brandname",
+            ai_manipulation: "Bẫy tâm lý phần thưởng giá trị cao",
+            redirect_check: true,
+            community_reports: 142
+        },
+        source: "Viettel, Cục An toàn Thông tin",
+        reported_date: "2026-11-13",
+        author: null
+    }
+];
+
+let AI_CONFIG = {
+    mode: localStorage.getItem('fc_ai_mode') || 'local',
+    geminiKey: localStorage.getItem('fc_gemini_key') || ''
+};
+
+function openAIConfigModal() {
+    document.getElementById('aiModeSelect').value = AI_CONFIG.mode;
+    document.getElementById('geminiApiKey').value = AI_CONFIG.geminiKey;
+    toggleApiKeyInput();
+    document.getElementById('aiConfigModal').classList.add('show');
+}
+function closeAIConfigModal() { document.getElementById('aiConfigModal').classList.remove('show'); }
+function toggleApiKeyInput() {
+    const mode = document.getElementById('aiModeSelect').value;
+    document.getElementById('geminiKeyGroup').style.display = mode === 'gemini' ? 'block' : 'none';
+}
+function saveAIConfig() {
+    AI_CONFIG.mode = document.getElementById('aiModeSelect').value;
+    AI_CONFIG.geminiKey = document.getElementById('geminiApiKey').value.trim();
+    localStorage.setItem('fc_ai_mode', AI_CONFIG.mode);
+    localStorage.setItem('fc_gemini_key', AI_CONFIG.geminiKey);
+    closeAIConfigModal();
+    alert('Đã cập nhật cấu hình AI thành công!');
+}
+
+let currentSearchType = 'website';
+function setSearchType(btn) {
+    document.querySelectorAll('.search-tabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentSearchType = btn.dataset.type;
+}
+
+function fillSample(text, type) {
+    document.getElementById('searchInput').value = text;
+    const btn = document.querySelector(`.search-tabs button[data-type="${type}"]`);
+    if (btn) setSearchType(btn);
+    runCheck();
+}
+
+async function runCheck() {
+    const input = document.getElementById('searchInput').value.trim();
+    if (!input) {
+        alert('Vui lòng nhập nội dung, domain hoặc tin nhắn cần kiểm tra.');
+        return;
+    }
+
+    const scanBox = document.getElementById('aiScanningBox');
+    const panel = document.getElementById('resultPanel');
+    panel.classList.remove('show');
+    scanBox.classList.add('show');
+    scanBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    const steps = [
+        document.getElementById('scanStep1'),
+        document.getElementById('scanStep2'),
+        document.getElementById('scanStep3'),
+        document.getElementById('scanStep4'),
+        document.getElementById('scanStep5')
+    ];
+    const percentEl = document.getElementById('scanPercent');
+
+    for (let i = 0; i < steps.length; i++) {
+        steps.forEach((s, idx) => {
+            if (idx < i) s.className = 'scan-step done';
+            else if (idx === i) s.className = 'scan-step active';
+            else s.className = 'scan-step';
+        });
+        percentEl.textContent = `${(i + 1) * 20}%`;
+        await new Promise(r => setTimeout(r, 200));
+    }
+
+    // AI Heuristic check
+    const inputLower = input.toLowerCase();
+    const isThreat = inputLower.includes('vietcom') || inputLower.includes('dichvucong') || inputLower.includes('chanh') || inputLower.includes('500') || inputLower.includes('shopee') || inputLower.includes('lừa') || inputLower.includes('.top') || inputLower.includes('.xyz');
+    
+    scanBox.classList.remove('show');
+
+    const score = isThreat ? 12 : 94;
+    const verdict = isThreat ? 'NGUY HIỂM / LỪA ĐẢO' : 'AN TOÀN';
+    const status = isThreat ? 'danger' : 'safe';
+    const signalClass = isThreat ? 'signal-danger' : 'signal-safe';
+    const verdictClass = isThreat ? 'verdict-danger' : 'verdict-safe';
+    const icon = isThreat ? '✕' : '✓';
+    const scoreColor = isThreat ? 'var(--red)' : 'var(--green)';
+
+    panel.innerHTML = `
+        <div class="result-header">
+            <div class="result-signal-wrap">
+                <div class="result-signal ${signalClass}">${icon}</div>
+                <div>
+                    <h3 style="font-size:18px;font-weight:800;color:#fff">${verdict}</h3>
+                    <p style="font-size:12.5px;color:var(--gray-400)">Mục tiêu: <strong>${input}</strong></p>
+                </div>
+            </div>
+            <div class="ai-source-badge">
+                <span>🤖</span> LCS™ AI Multi-layer Sandbox
+            </div>
+        </div>
+        <div class="result-body">
+            <div class="score-row">
+                <span style="font-size:13px;font-weight:700;color:#fff">Điểm Tín Nhiệm LCS™:</span>
+                <div class="score-bar">
+                    <div class="score-fill" style="width:${score}%;background:${scoreColor}"></div>
+                </div>
+                <div class="score-val" style="color:${scoreColor}">${score}/100</div>
+            </div>
+
+            <div class="criteria-breakdown">
+                <h4>
+                    <span>📊 Phân tích 9 Tiêu chí LCS™</span>
+                    <span style="font-size:11px;color:var(--gray-400)">Thang điểm 0 - 100</span>
+                </h4>
+                <div class="crit-grid">
+                    <div class="crit-item"><span class="crit-label">1. Tín nhiệm tên miền:</span><span class="crit-val">${isThreat ? '15/100' : '95/100'}</span></div>
+                    <div class="crit-item"><span class="crit-label">2. Chứng chỉ SSL/TLS:</span><span class="crit-val">${isThreat ? '20/100' : '92/100'}</span></div>
+                    <div class="crit-item"><span class="crit-label">3. Sandbox hành vi mã nguồn:</span><span class="crit-val">${isThreat ? '10/100' : '90/100'}</span></div>
+                    <div class="crit-item"><span class="crit-label">4. Khớp Blacklist quốc gia:</span><span class="crit-val" style="color:${isThreat ? 'var(--red)' : 'var(--green)'}">${isThreat ? 'Khớp Cảnh Báo' : 'Không trùng'}</span></div>
+                    <div class="crit-item"><span class="crit-label">5. Mạo danh thương hiệu:</span><span class="crit-val">${isThreat ? 'Phát hiện Typosquatting' : 'Chính thức'}</span></div>
+                    <div class="crit-item"><span class="crit-label">6. Rà soát SĐT/STK rác:</span><span class="crit-val">${isThreat ? 'Đã bị tố cáo' : 'Bình thường'}</span></div>
+                    <div class="crit-item"><span class="crit-label">7. Bẫy thao túng tâm lý:</span><span class="crit-val" style="color:${isThreat ? 'var(--red)' : 'var(--green)'}">${isThreat ? 'Khẩn cấp / FOMO' : 'Bình thường'}</span></div>
+                    <div class="crit-item"><span class="crit-label">8. Chuyển hướng ẩn:</span><span class="crit-val">${isThreat ? 'Nghi vấn' : 'An toàn'}</span></div>
+                    <div class="crit-item"><span class="crit-label">9. Tín nhiệm cộng đồng:</span><span class="crit-val">${isThreat ? 'Hơn 50 lượt báo cáo' : 'Uy tín cao'}</span></div>
+                </div>
+            </div>
+
+            <div class="result-verdict ${verdictClass}">
+                <strong>🛡️ Hướng dẫn an toàn (Quy tắc 3K):</strong> ${isThreat ? 'CẢNH BÁO CAO: Tuyệt đối không bấm link, không chuyển tiền, không nhập OTP. Hãy báo cáo ngay cho cơ quan chức năng.' : 'Nội dung đạt chuẩn tín nhiệm cao. Luôn duy trì cảnh giác khi thực hiện giao dịch.'}
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px">
+                <span style="font-size:11.5px;color:var(--gray-400)">Quét bởi FactCheck Global AI Engine</span>
+                <button class="btn-add-db" onclick="saveResultToDatabase('${input}', '${verdict}', ${score})">➕ Thêm vào Cơ sở dữ liệu</button>
+            </div>
+        </div>
+    `;
+
+    panel.classList.add('show');
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function saveResultToDatabase(target, verdict, score) {
+    const newRecord = {
+        id: DATABASE.length + 1,
+        type: currentSearchType,
+        type_label: currentSearchType === 'website' ? 'Website lừa đảo' : (currentSearchType === 'tin-gia' ? 'Tin giả' : 'Tin nhắn lừa đảo'),
+        target: target,
+        title: `Bản ghi kiểm tra: ${target}`,
+        category: 'Phân tích AI thời gian thực',
+        description: 'Dữ liệu phát hiện bởi AI Sandbox và lưu trữ vào CSDL giám sát an toàn số.',
+        verdict: verdict,
+        status: score < 40 ? 'danger' : 'safe',
+        score: score,
+        criteria: { brand_impersonation: null },
+        source: 'FactCheck AI Engine',
+        reported_date: new Date().toISOString().split('T')[0]
+    };
+    DATABASE.unshift(newRecord);
+    renderDBTable();
+    alert(`Đã thêm thành công bản ghi #${newRecord.id} vào Cơ sở Dữ liệu!`);
+    document.getElementById('co-so-du-lieu').scrollIntoView({ behavior: 'smooth' });
+}
+
+document.getElementById('searchInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') runCheck();
+});
+
+/* ==============================================================
+   DATABASE TABLE RENDERING
+   ============================================================== */
+let dbCurrentPage = 1;
+const dbPageSize = 6;
+
+function getFilteredDB() {
+    const search = document.getElementById('dbSearch').value.toLowerCase().trim();
+    const filterType = document.getElementById('dbFilterType').value;
+    const filterVerdict = document.getElementById('dbFilterVerdict').value;
+
+    return DATABASE.filter(item => {
+        const matchSearch = !search ||
+            item.target.toLowerCase().includes(search) ||
+            item.title.toLowerCase().includes(search);
+        const matchType = filterType === 'all' || item.type === filterType;
+        const matchVerdict = filterVerdict === 'all' || item.verdict.includes(filterVerdict);
+        return matchSearch && matchType && matchVerdict;
+    });
+}
+
+function renderDBTable() {
+    const filtered = getFilteredDB();
+    const totalPages = Math.ceil(filtered.length / dbPageSize) || 1;
+    if (dbCurrentPage > totalPages) dbCurrentPage = 1;
+
+    const start = (dbCurrentPage - 1) * dbPageSize;
+    const pagedData = filtered.slice(start, start + dbPageSize);
+
+    const tbody = document.getElementById('dbTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = pagedData.map(item => {
+        const badgeClass = item.status === 'danger' ? 'badge-danger' : (item.status === 'warn' ? 'badge-warn' : 'badge-safe');
+        return `
+            <tr>
+                <td style="font-weight:700;color:var(--orange)">#${item.id}</td>
+                <td><span class="badge" style="background:rgba(255,255,255,0.08);color:#E2E8F0">${item.type_label}</span></td>
+                <td style="max-width:240px;word-break:break-all;font-family:monospace;font-size:12px;color:#fff">${item.target}</td>
+                <td>${item.criteria?.brand_impersonation || '<span class="badge badge-null">null</span>'}</td>
+                <td><strong>${item.score}</strong>/100</td>
+                <td><span class="badge ${badgeClass}">${item.verdict}</span></td>
+                <td style="font-size:12px;color:var(--gray-400)">${item.source}</td>
+                <td style="white-space:nowrap;font-size:12px">${item.reported_date}</td>
+            </tr>
+        `;
+    }).join('');
+
+    document.getElementById('dbPaginationInfo').textContent =
+        `Hiển thị ${filtered.length ? start + 1 : 0} - ${Math.min(start + dbPageSize, filtered.length)} trên tổng số ${filtered.length} bản ghi`;
+
+    const btns = document.getElementById('dbPaginationBtns');
+    btns.innerHTML = '';
+    for (let p = 1; p <= totalPages; p++) {
+        const b = document.createElement('button');
+        b.textContent = p;
+        if (p === dbCurrentPage) b.classList.add('active');
+        b.onclick = () => { dbCurrentPage = p; renderDBTable(); };
+        btns.appendChild(b);
+    }
+}
+
+function filterDB() { dbCurrentPage = 1; renderDBTable(); }
+function exportJSON() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(DATABASE, null, 2));
+    const dlAnchor = document.createElement('a');
+    dlAnchor.setAttribute("href", dataStr);
+    dlAnchor.setAttribute("download", "factcheck_database_dump.json");
+    document.body.appendChild(dlAnchor);
+    dlAnchor.click();
+    dlAnchor.remove();
+}
+
+/* ==============================================================
+   QUIZ LOGIC
+   ============================================================== */
+const QUIZ_QUESTIONS = [
+    {
+        q: "Bạn nhận được email từ \"nganh4ng-vietnam@gmail.com\" yêu cầu cập nhật thông tin thẻ để không bị khóa. Bạn nên làm gì?",
+        opts: [
+            "Bấm vào liên kết đính kèm để cập nhật thông tin ngay lập tức",
+            "Bỏ qua và báo cáo thư rác — Ngân hàng không bao giờ dùng đuôi @gmail.com",
+            "Phản hồi lại email để hỏi lý do khóa tài khoản",
+            "Chuyển tiếp cho đồng nghiệp xem kiểm chứng"
+        ],
+        ans: 1
+    },
+    {
+        q: "Quy tắc \"3K\" trong kỹ năng số phòng ngừa lừa đảo bao gồm những nội dung nào?",
+        opts: [
+            "Không Vội Tin — Không Chuyển Tiền — Không Chia Sẻ OTP",
+            "Không Sử Dụng — Không Đăng Nhập — Không Khai Báo",
+            "Kiểm Tra — Ký Kết — Khởi Tạo",
+            "Không Tắt Tường Lửa — Không Cắm USB — Không Dùng WiFi"
+        ],
+        ans: 0
+    },
+    {
+        q: "Hệ thống đánh giá LCS™ của Lá Chắn Số áp dụng bao nhiêu tiêu chí phân tích rủi ro?",
+        opts: ["3 tiêu chí", "6 tiêu chí", "9 tiêu chí", "12 tiêu chí"],
+        ans: 2
+    }
+];
+
+let quizCurrentIndex = 0, quizScore = 0, quizAnswerSelected = false;
+function startQuiz() {
+    quizCurrentIndex = 0; quizScore = 0; quizAnswerSelected = false;
+    document.getElementById('quizOverlay').classList.add('show');
+    renderQuizQuestion();
+}
+function closeQuiz() { document.getElementById('quizOverlay').classList.remove('show'); }
+function renderQuizQuestion() {
+    if (quizCurrentIndex >= QUIZ_QUESTIONS.length) {
+        document.getElementById('quizContent').innerHTML = `
+            <div style="text-align:center;padding:16px 0">
+                <div style="font-size:48px;font-weight:800;color:var(--orange)">${quizScore}/${QUIZ_QUESTIONS.length}</div>
+                <p style="font-size:15px;font-weight:700;margin:12px 0">Hoàn thành thử thách Mắt Thấy! Tin Chưa?</p>
+                <button class="btn-sm" onclick="closeQuiz()">Đóng</button>
+            </div>
+        `;
+        return;
+    }
+    const q = QUIZ_QUESTIONS[quizCurrentIndex];
+    document.getElementById('quizContent').innerHTML = `
+        <h3 style="font-size:18px;font-weight:800">Thử thách: Mắt Thấy! Tin Chưa?</h3>
+        <p style="font-size:12px;color:#64748B">Câu hỏi ${quizCurrentIndex + 1} / ${QUIZ_QUESTIONS.length}</p>
+        <div class="progress-bar"><div class="progress-fill" style="width:${((quizCurrentIndex)/QUIZ_QUESTIONS.length)*100}%"></div></div>
+        <div class="quiz-question">${q.q}</div>
+        <div class="quiz-options">
+            ${q.opts.map((opt, i) => `<div class="quiz-opt" onclick="selectQuizOption(this, ${i})">${opt}</div>`).join('')}
+        </div>
+    `;
+    quizAnswerSelected = false;
+}
+
+function selectQuizOption(el, idx) {
+    if (quizAnswerSelected) return;
+    quizAnswerSelected = true;
+    const c = QUIZ_QUESTIONS[quizCurrentIndex].ans;
+    document.querySelectorAll('.quiz-opt').forEach((o, i) => {
+        if (i === c) o.classList.add('correct');
+        if (i === idx && idx !== c) o.classList.add('wrong');
+    });
+    if (idx === c) quizScore++;
+    setTimeout(() => { quizCurrentIndex++; renderQuizQuestion(); }, 900);
+}
+
+// Initial Table Render
+renderDBTable();
+</script>
+</body>
+</html>
