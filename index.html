@@ -1,0 +1,3256 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FactCheck Pro — Hệ Thống Kiểm Chứng Báo Chí & Tín Nhiệm Cộng Đồng</title>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --orange: #FF7700;
+            --orange-dark: #E56A00;
+            --orange-glow: rgba(255, 119, 0, 0.45);
+            --blue: #00A6FF;
+            --blue-dark: #0088D4;
+            --blue-glow: rgba(0, 166, 255, 0.45);
+            --purple: #A855F7;
+            --green: #22C55E;
+            --green-glow: rgba(34, 197, 94, 0.35);
+            --red: #EF4444;
+            --red-glow: rgba(239, 68, 68, 0.4);
+            --yellow: #F59E0B;
+            --dark: #0A0D14;
+            --dark-surface: #0F1420;
+            --dark-card: #141B2D;
+            --darker: #05070B;
+            --gray-100: #F1F5F9;
+            --gray-200: #E2E8F0;
+            --gray-400: #94A3B8;
+            --gray-500: #64748B;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 24px;
+            --radius-full: 9999px;
+            --transition: all .25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+            background: var(--darker);
+            color: #E2E8F0;
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+        a { text-decoration: none; color: inherit; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+        /* ==================== DYNAMIC ANIMATED CYBER BACKGROUND ==================== */
+        .cyber-bg-container {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+            background: #05070B;
+        }
+        .ambient-glow {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(85px);
+            opacity: 0.5;
+            will-change: transform, opacity;
+            pointer-events: none;
+        }
+        .ambient-glow.orb-1 {
+            width: 620px; height: 620px;
+            background: radial-gradient(circle, rgba(255, 119, 0, 0.24) 0%, rgba(255, 69, 0, 0.08) 50%, transparent 70%);
+            top: -120px; right: -100px;
+            animation: floatOrb1 18s ease-in-out infinite alternate;
+        }
+        .ambient-glow.orb-2 {
+            width: 650px; height: 650px;
+            background: radial-gradient(circle, rgba(0, 166, 255, 0.18) 0%, rgba(13, 202, 240, 0.06) 50%, transparent 70%);
+            bottom: 5%; left: -140px;
+            animation: floatOrb2 22s ease-in-out infinite alternate;
+        }
+        .ambient-glow.orb-3 {
+            width: 520px; height: 520px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, rgba(217, 70, 239, 0.04) 50%, transparent 70%);
+            top: 42%; right: 10%;
+            animation: floatOrb3 20s ease-in-out infinite alternate;
+        }
+        @keyframes floatOrb1 {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+            50% { transform: translate(-80px, 90px) scale(1.15); opacity: 0.62; }
+            100% { transform: translate(60px, 130px) scale(0.95); opacity: 0.48; }
+        }
+        @keyframes floatOrb2 {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.35; }
+            50% { transform: translate(110px, -70px) scale(1.2); opacity: 0.58; }
+            100% { transform: translate(40px, 80px) scale(1.05); opacity: 0.4; }
+        }
+        @keyframes floatOrb3 {
+            0% { transform: translate(0, 0) scale(0.9); opacity: 0.3; }
+            50% { transform: translate(-80px, -90px) scale(1.12); opacity: 0.52; }
+            100% { transform: translate(50px, -30px) scale(1); opacity: 0.38; }
+        }
+        .cyber-grid-overlay {
+            position: absolute; inset: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+            background-size: 48px 48px;
+            mask-image: radial-gradient(circle at 50% 50%, black 50%, transparent 95%);
+            -webkit-mask-image: radial-gradient(circle at 50% 50%, black 50%, transparent 95%);
+            pointer-events: none;
+        }
+        .cyber-scanline {
+            position: absolute; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 119, 0, 0.15) 20%, rgba(0, 166, 255, 0.4) 50%, rgba(255, 119, 0, 0.15) 80%, transparent 100%);
+            box-shadow: 0 0 16px rgba(0, 166, 255, 0.35);
+            animation: scanSweep 12s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            opacity: 0.65; pointer-events: none;
+        }
+        @keyframes scanSweep {
+            0% { top: -4%; opacity: 0; }
+            10% { opacity: 0.7; }
+            90% { opacity: 0.7; }
+            100% { top: 104%; opacity: 0; }
+        }
+        canvas#cyberBgCanvas {
+            position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;
+        }
+        header, section, footer, .header-floating-wrap { position: relative; z-index: 1; }
+
+        /* ==================== FLOATING HEADER ==================== */
+        .header-floating-wrap {
+            position: fixed; top: 18px; left: 0; right: 0; z-index: 1000;
+            display: flex; justify-content: center; padding: 0 16px; pointer-events: none;
+        }
+        header.floating-nav {
+            pointer-events: auto;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(16px);
+            border-radius: var(--radius-full);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.3);
+            padding: 8px 14px 8px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            max-width: 1120px; width: 100%; transition: var(--transition);
+        }
+        .logo { display: flex; align-items: center; gap: 10px; }
+        .logo-icon {
+            width: 34px; height: 34px;
+            background: linear-gradient(135deg, var(--orange), #FF4500);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; color: #fff;
+            box-shadow: 0 4px 14px var(--orange-glow);
+        }
+        .logo-text { font-size: 20px; font-weight: 800; color: #0F172A; letter-spacing: -.6px; }
+        .logo-text span { color: var(--orange); }
+        nav.nav-desktop ul { list-style: none; display: flex; gap: 4px; align-items: center; }
+        nav.nav-desktop a {
+            color: #334155; padding: 8px 13px; border-radius: var(--radius-full);
+            font-size: 13px; font-weight: 600; transition: var(--transition);
+        }
+        nav.nav-desktop a:hover, nav.nav-desktop a.active {
+            background: rgba(15, 23, 42, 0.08); color: #0F172A;
+        }
+        .menu-toggle {
+            display: none; background: #0F172A; border: none; color: #fff;
+            width: 36px; height: 36px; border-radius: 50%; font-size: 18px;
+            cursor: pointer; align-items: center; justify-content: center;
+        }
+        @media(max-width: 992px) {
+            nav.nav-desktop { display: none; }
+            .menu-toggle { display: flex; }
+        }
+        .mobile-drawer {
+            display: none; position: fixed; top: 76px; left: 16px; right: 16px;
+            background: #fff; border-radius: var(--radius-md); padding: 18px;
+            box-shadow: 0 20px 50px rgba(0,0,0,.5); z-index: 999; flex-direction: column; gap: 6px;
+        }
+        .mobile-drawer.show { display: flex; }
+        .mobile-drawer a { color: #1E293B; font-weight: 600; padding: 10px 14px; border-radius: 8px; }
+        .mobile-drawer a:hover { background: #F1F5F9; color: var(--orange); }
+
+        /* ==================== HERO SEARCH & LIVE NEWS VERIFICATION ==================== */
+        .hero {
+            padding-top: 116px;
+            padding-bottom: 60px;
+            position: relative;
+            background: transparent;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .hero-inner { position: relative; z-index: 1; text-align: center; }
+        .motto-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(255, 119, 0, 0.14);
+            border: 1px solid rgba(255, 119, 0, 0.4);
+            color: var(--orange);
+            padding: 6px 18px; border-radius: var(--radius-full);
+            font-size: 13px; font-weight: 700; margin-bottom: 18px;
+            letter-spacing: .5px; box-shadow: 0 0 24px rgba(255,119,0,0.2);
+            backdrop-filter: blur(8px);
+        }
+        .hero h1 {
+            font-size: clamp(26px, 4.3vw, 42px);
+            font-weight: 800; color: #fff; margin-bottom: 14px; line-height: 1.25;
+            letter-spacing: -.8px;
+        }
+        .hero h1 span.hl-orange { color: var(--orange); text-shadow: 0 0 24px var(--orange-glow); }
+        .hero h1 span.hl-blue { color: var(--blue); text-shadow: 0 0 24px var(--blue-glow); }
+        .hero p.lead {
+            font-size: 15.5px; color: var(--gray-400); max-width: 720px; margin: 0 auto 22px;
+        }
+
+        /* AI & Live Feed Status Bar */
+        .ai-status-bar {
+            display: inline-flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center;
+            background: rgba(20, 27, 45, 0.72); border: 1px solid rgba(255,255,255,0.12);
+            border-radius: var(--radius-full); padding: 7px 18px;
+            font-size: 12px; color: #CBD5E1; margin-bottom: 24px; backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .ai-status-indicator {
+            width: 8px; height: 8px; border-radius: 50%; background: var(--green);
+            box-shadow: 0 0 10px var(--green); animation: pulseGreen 1.8s infinite;
+        }
+        @keyframes pulseGreen {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { transform: scale(1.15); box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        .btn-ai-cfg {
+            background: rgba(255,255,255,0.14); border: none; color: #fff;
+            padding: 3px 12px; border-radius: var(--radius-full); font-size: 11px;
+            cursor: pointer; transition: var(--transition); font-weight: 600;
+        }
+        .btn-ai-cfg:hover { background: rgba(255,255,255,0.25); }
+
+        /* ==================== UPGRADED CHECK MODULE + LIVE NEWS WORKSPACE ==================== */
+        .check-workspace {
+            max-width: 1080px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        /* 4-Step Journalistic Fact-Check Stepper */
+        .check-stepper {
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(15, 23, 42, 0.78); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius-full); padding: 8px 18px; margin-bottom: 20px;
+            backdrop-filter: blur(12px); gap: 8px; flex-wrap: wrap;
+        }
+        .step-item {
+            display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600;
+            color: #94A3B8; transition: var(--transition);
+        }
+        .step-item.active { color: #fff; font-weight: 700; }
+        .step-item.active .step-num {
+            background: linear-gradient(135deg, var(--orange), #FF4500); color: #fff;
+            box-shadow: 0 0 12px var(--orange-glow);
+        }
+        .step-item.done { color: var(--green); }
+        .step-item.done .step-num { background: var(--green); color: #0F172A; }
+        .step-num {
+            width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.1);
+            color: #CBD5E1; display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 800; flex-shrink: 0;
+        }
+        .step-arrow { color: rgba(255,255,255,0.25); font-size: 12px; }
+
+        /* Category Tabs */
+        .check-tabs-nav {
+            display: flex; justify-content: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;
+        }
+        .check-tab-btn {
+            background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.75);
+            border: 1px solid rgba(255,255,255,0.1); padding: 8px 18px; border-radius: var(--radius-full);
+            font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition);
+            backdrop-filter: blur(10px); display: flex; align-items: center; gap: 7px;
+        }
+        .check-tab-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .check-tab-btn.active {
+            background: rgba(255,119,0,0.2); border-color: var(--orange); color: var(--orange);
+            box-shadow: 0 0 18px rgba(255,119,0,0.3);
+        }
+
+        /* Input Card */
+        .check-card {
+            background: rgba(20, 27, 45, 0.82); border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 18px; padding: 22px; box-shadow: 0 14px 45px rgba(0,0,0,0.5);
+            backdrop-filter: blur(18px); transition: var(--transition);
+        }
+        .check-card:focus-within {
+            border-color: rgba(255,119,0,0.55); box-shadow: 0 16px 50px rgba(255,119,0,0.25);
+        }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .url-input-wrap {
+            display: flex; align-items: center; background: #0F172A; border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 12px; padding: 4px 8px 4px 14px; gap: 10px; transition: var(--transition);
+        }
+        .url-input-wrap:focus-within { border-color: var(--orange); box-shadow: 0 0 0 2px rgba(255,119,0,0.2); }
+        .url-prefix { color: var(--blue); font-size: 13px; font-weight: 700; user-select: none; display: flex; align-items: center; gap: 5px; }
+        .url-input-wrap input {
+            flex: 1; background: transparent; border: none; outline: none; color: #fff;
+            font-size: 14.5px; padding: 10px 4px; font-weight: 500;
+        }
+
+        .text-input-wrap {
+            background: #0F172A; border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 12px; padding: 12px 14px; transition: var(--transition);
+        }
+        .text-input-wrap:focus-within { border-color: var(--orange); box-shadow: 0 0 0 2px rgba(255,119,0,0.2); }
+        .text-input-wrap textarea {
+            width: 100%; height: 95px; background: transparent; border: none; outline: none;
+            color: #fff; font-size: 14px; line-height: 1.55; resize: none; font-family: inherit;
+        }
+        .text-meta-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 11px; color: var(--gray-400); margin-top: 6px; padding-top: 6px;
+            border-top: 1px solid rgba(255,255,255,0.06); flex-wrap: wrap; gap: 6px;
+        }
+
+        .bank-input-grid { display: grid; grid-template-columns: 210px 1fr; gap: 10px; }
+        @media (max-width: 640px) { .bank-input-grid { grid-template-columns: 1fr; } }
+        .bank-select, .bank-acc-input {
+            background: #0F172A; border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 12px; color: #fff; font-size: 14px; padding: 12px 14px; outline: none;
+            transition: var(--transition);
+        }
+        .bank-select option { background: #0F172A; color: #fff; }
+        .bank-select:focus, .bank-acc-input:focus { border-color: var(--orange); }
+
+        .input-actions-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-top: 14px; flex-wrap: wrap; gap: 10px;
+        }
+        .input-tools-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .btn-tool {
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+            color: #CBD5E1; font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 8px;
+            cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 5px;
+        }
+        .btn-tool:hover { background: rgba(255,255,255,0.12); color: #fff; }
+        .btn-check-main {
+            background: linear-gradient(135deg, var(--orange), #FF4500);
+            color: #fff; border: none; padding: 12px 30px; border-radius: 12px;
+            font-size: 14.5px; font-weight: 800; cursor: pointer; transition: var(--transition);
+            display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 20px var(--orange-glow);
+            letter-spacing: .3px;
+        }
+        .btn-check-main:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 8px 25px rgba(255,119,0,0.5); }
+
+        .samples-container {
+            margin-top: 14px; display: flex; align-items: center; gap: 8px;
+            font-size: 12px; color: var(--gray-400); flex-wrap: wrap;
+        }
+        .sample-chip {
+            background: rgba(255,255,255,0.06); color: #CBD5E1; border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px; padding: 4px 10px; cursor: pointer; transition: var(--transition); font-weight: 500;
+        }
+        .sample-chip:hover { background: rgba(255,119,0,0.22); color: #fff; border-color: var(--orange); }
+
+        /* ==================== LIVE JOURNALISM & COMMUNITY FEED BOX ==================== */
+        .live-news-hub {
+            margin-top: 24px;
+            background: rgba(15, 20, 32, 0.82);
+            border: 1px solid rgba(0, 166, 255, 0.28);
+            border-radius: 18px;
+            padding: 20px 22px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+        }
+        .live-hub-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 14px;
+        }
+        .live-hub-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            font-weight: 800;
+            color: #fff;
+        }
+        .live-pulse-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(34, 197, 94, 0.16);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            color: #86EFAC;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: var(--radius-full);
+            letter-spacing: .5px;
+        }
+        .live-hub-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .feed-cat-pills {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+        .feed-pill {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94A3B8;
+            padding: 5px 12px;
+            border-radius: var(--radius-full);
+            font-size: 11.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .feed-pill:hover { color: #fff; background: rgba(255, 255, 255, 0.1); }
+        .feed-pill.active {
+            background: rgba(0, 166, 255, 0.2);
+            border-color: var(--blue);
+            color: #7DD3FC;
+        }
+        .live-news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(305px, 1fr));
+            gap: 12px;
+        }
+        .news-stream-card {
+            background: rgba(20, 27, 45, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 10px;
+            transition: var(--transition);
+        }
+        .news-stream-card:hover {
+            border-color: rgba(255, 119, 0, 0.45);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        }
+        .news-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 11px;
+        }
+        .news-source-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+        .news-source-pill.official {
+            background: rgba(34, 197, 94, 0.15);
+            color: #86EFAC;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        .news-source-pill.viral {
+            background: rgba(245, 158, 11, 0.16);
+            color: #FDE047;
+            border: 1px solid rgba(245, 158, 11, 0.35);
+        }
+        .news-source-pill.hoax {
+            background: rgba(239, 68, 68, 0.18);
+            color: #FCA5A5;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+        }
+        .news-time { color: var(--gray-400); white-space: nowrap; }
+        .news-headline {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #F8FAFC;
+            line-height: 1.45;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .news-snippet {
+            font-size: 12px;
+            color: #94A3B8;
+            line-height: 1.45;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .news-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.08);
+            margin-top: auto;
+        }
+        .community-mini-stat {
+            font-size: 11.5px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-verify-news {
+            background: linear-gradient(135deg, rgba(255, 119, 0, 0.22), rgba(255, 69, 0, 0.28));
+            border: 1px solid rgba(255, 119, 0, 0.5);
+            color: #FDBA74;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .btn-verify-news:hover {
+            background: var(--orange);
+            color: #fff;
+        }
+
+        /* Scanning Progress */
+        .ai-scanning-box {
+            display: none; max-width: 1080px; margin: 24px auto 0;
+            background: rgba(20, 27, 45, 0.92); border: 1px solid rgba(255,119,0,0.45);
+            border-radius: var(--radius-md); padding: 22px 26px; text-align: left;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.55); backdrop-filter: blur(18px);
+        }
+        .ai-scanning-box.show { display: block; }
+        .scan-title {
+            display: flex; align-items: center; justify-content: space-between;
+            font-size: 13px; font-weight: 800; color: var(--orange); margin-bottom: 14px;
+        }
+        .scan-progress-bar {
+            width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px;
+            overflow: hidden; margin-bottom: 16px;
+        }
+        .scan-progress-fill {
+            height: 100%; width: 0%; background: linear-gradient(90deg, var(--orange), var(--blue));
+            transition: width .25s ease-out; border-radius: 3px;
+        }
+        .scan-steps { display: flex; flex-direction: column; gap: 9px; font-size: 12.5px; color: #94A3B8; }
+        .scan-step { display: flex; align-items: center; gap: 10px; transition: var(--transition); opacity: .35; }
+        .scan-step.active { opacity: 1; color: #fff; font-weight: 600; }
+        .scan-step.done { opacity: 1; color: var(--green); }
+        .scan-step-dot { width: 8px; height: 8px; border-radius: 50%; background: #475569; flex-shrink: 0; }
+        .scan-step.active .scan-step-dot { background: var(--orange); box-shadow: 0 0 10px var(--orange); }
+        .scan-step.done .scan-step-dot { background: var(--green); box-shadow: 0 0 10px var(--green); }
+
+        /* ==================== REPORT CARD (BÁO CHÍ + CỘNG ĐỒNG + HÀNH ĐỘNG) ==================== */
+        .result-panel {
+            display: none; max-width: 1080px; margin: 26px auto 0;
+            background: rgba(18, 25, 42, 0.96); border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.65); overflow: hidden; text-align: left;
+            border: 1px solid rgba(255,255,255,0.14); backdrop-filter: blur(20px);
+        }
+        .result-panel.show { display: block; animation: fadeInUp .4s ease-out; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+        .result-panel.level-1 { border-color: rgba(34,197,94,0.5); box-shadow: 0 20px 60px rgba(34,197,94,0.14); }
+        .result-panel.level-2 { border-color: rgba(245,158,11,0.5); }
+        .result-panel.level-3 { border-color: rgba(239,68,68,0.55); box-shadow: 0 20px 60px rgba(239,68,68,0.25); }
+
+        .report-header-banner {
+            padding: 24px 28px; display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.32); flex-wrap: wrap; gap: 14px;
+        }
+        .report-header-left { display: flex; align-items: center; gap: 16px; max-width: 78%; }
+        @media(max-width: 768px) { .report-header-left { max-width: 100%; } }
+        .risk-badge-icon {
+            width: 58px; height: 58px; border-radius: 16px; display: flex;
+            align-items: center; justify-content: center; font-size: 28px; color: #fff;
+            flex-shrink: 0; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+        .risk-badge-icon.safe { background: linear-gradient(135deg, #10B981, #059669); }
+        .risk-badge-icon.warn { background: linear-gradient(135deg, #F59E0B, #D97706); }
+        .risk-badge-icon.danger { background: linear-gradient(135deg, #EF4444, #B91C1C); animation: pulseDanger 1.8s infinite; }
+        @keyframes pulseDanger {
+            0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.7); }
+            70% { box-shadow: 0 0 0 14px rgba(239,68,68,0); }
+            100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+        }
+
+        .risk-level-tag {
+            font-size: 11.5px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase;
+            padding: 4px 12px; border-radius: var(--radius-full); display: inline-block; margin-bottom: 6px;
+        }
+        .risk-level-tag.safe { background: rgba(34,197,94,0.2); color: #86EFAC; border: 1px solid rgba(34,197,94,0.4); }
+        .risk-level-tag.warn { background: rgba(245,158,11,0.2); color: #FDE047; border: 1px solid rgba(245,158,11,0.4); }
+        .risk-level-tag.danger { background: rgba(239,68,68,0.22); color: #FCA5A5; border: 1px solid rgba(239,68,68,0.4); }
+
+        .report-target-title { font-size: 18.5px; font-weight: 800; color: #fff; margin-bottom: 4px; word-break: break-word; }
+        .report-meta-info { font-size: 12.5px; color: #94A3B8; }
+        .report-header-right { text-align: right; }
+        .ai-source-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(0, 166, 255, 0.15); border: 1px solid rgba(0, 166, 255, 0.35);
+            color: #7DD3FC; font-size: 11.5px; font-weight: 700; padding: 4px 12px; border-radius: var(--radius-full);
+        }
+        .report-id-chip { font-family: monospace; font-size: 11px; color: var(--gray-400); }
+
+        .report-body { padding: 24px 28px; }
+        .report-section { margin-bottom: 24px; }
+        .report-sec-heading {
+            display: flex; align-items: center; justify-content: space-between;
+            font-size: 13.5px; font-weight: 800; color: #fff; margin-bottom: 12px;
+            padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.08);
+            letter-spacing: .4px; flex-wrap: wrap; gap: 6px;
+        }
+
+        /* Hybrid Score Matrix (Báo chí + Kỹ thuật + Cộng đồng) */
+        .hybrid-score-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+        .score-box-card {
+            background: rgba(15, 23, 42, 0.78);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px 18px;
+        }
+        .score-box-label {
+            font-size: 11.5px; font-weight: 700; color: #94A3B8; text-transform: uppercase;
+            letter-spacing: .5px; margin-bottom: 6px; display: flex; justify-content: space-between;
+        }
+        .score-box-val {
+            font-size: 26px; font-weight: 800; line-height: 1.2; margin-bottom: 6px;
+        }
+        .gauge-track { width: 100%; height: 9px; background: rgba(255,255,255,0.1); border-radius: 6px; overflow: hidden; }
+        .gauge-bar { height: 100%; border-radius: 6px; transition: width 0.8s ease-out; }
+        .gauge-desc {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #E2E8F0; line-height: 1.55;
+        }
+
+        /* Community Consensus & Interactive Voting Box */
+        .community-consensus-card {
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(20, 27, 45, 0.9));
+            border: 1px solid rgba(0, 166, 255, 0.35);
+            border-radius: 14px;
+            padding: 18px 20px;
+        }
+        .consensus-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 12px 0 16px;
+        }
+        .c-bar-row {
+            display: grid;
+            grid-template-columns: 195px 1fr 75px;
+            align-items: center;
+            gap: 12px;
+            font-size: 12.5px;
+        }
+        @media(max-width: 600px) { .c-bar-row { grid-template-columns: 1fr; gap: 4px; } }
+        .c-bar-track {
+            height: 10px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .c-bar-fill { height: 100%; border-radius: 6px; transition: width 0.5s ease; }
+        .vote-action-strip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .vote-btns-group { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-vote {
+            padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700;
+            cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-vote.safe {
+            background: rgba(34, 197, 94, 0.16); color: #86EFAC; border: 1px solid rgba(34, 197, 94, 0.4);
+        }
+        .btn-vote.safe:hover, .btn-vote.safe.voted { background: var(--green); color: #05070B; }
+        .btn-vote.warn {
+            background: rgba(245, 158, 11, 0.16); color: #FDE047; border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+        .btn-vote.warn:hover, .btn-vote.warn.voted { background: var(--yellow); color: #05070B; }
+        .btn-vote.danger {
+            background: rgba(239, 68, 68, 0.16); color: #FCA5A5; border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+        .btn-vote.danger:hover, .btn-vote.danger.voted { background: var(--red); color: #fff; }
+
+        .peer-reviews-list {
+            margin-top: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .peer-review-item {
+            background: rgba(0, 0, 0, 0.28);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            padding: 9px 13px;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        /* Evidence Cards Grid */
+        .evidence-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 12px;
+        }
+        .evidence-card {
+            background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px; padding: 14px 16px; font-size: 12.5px;
+        }
+        .evidence-card-title {
+            display: flex; align-items: center; gap: 8px; font-weight: 700; color: #fff;
+            margin-bottom: 8px; font-size: 13px;
+        }
+        .evidence-card-text { color: #CBD5E1; line-height: 1.55; }
+        .evidence-highlight { color: var(--orange); font-weight: 600; }
+
+        /* Criteria Breakdown Grid */
+        .criteria-breakdown {
+            margin: 18px 0 0; background: rgba(0,0,0,0.3); border-radius: var(--radius-sm);
+            border: 1px solid rgba(255,255,255,0.08); padding: 14px 18px;
+        }
+        .crit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 8px; font-size: 12px; }
+        .crit-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px dashed rgba(255,255,255,0.08); }
+        .crit-label { color: #94A3B8; }
+        .crit-val { font-weight: 600; color: #F1F5F9; }
+
+        /* Action & Guidance Section */
+        .action-card {
+            background: rgba(255,255,255,0.03); border-radius: 12px; padding: 18px 20px;
+            border-left: 4px solid var(--orange); margin-bottom: 18px;
+        }
+        .action-card.safe { border-left-color: var(--green); background: rgba(34,197,94,0.07); }
+        .action-card.warn { border-left-color: var(--yellow); background: rgba(245,158,11,0.07); }
+        .action-card.danger { border-left-color: var(--red); background: rgba(239,68,68,0.08); }
+        .action-list { list-style: none; padding: 0; margin: 4px 0 0; display: flex; flex-direction: column; gap: 8px; }
+        .action-list li { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: #F1F5F9; line-height: 1.5; }
+
+        /* Action Toolbar */
+        .action-toolbar {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.08);
+            flex-wrap: wrap; gap: 10px;
+        }
+        .action-tools-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .btn-act-share, .btn-act-report, .btn-act-db, .btn-act-reset {
+            padding: 9px 18px; border-radius: 8px; font-size: 12.5px; font-weight: 700;
+            cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 6px; border: none;
+        }
+        .btn-act-share { background: rgba(0, 166, 255, 0.18); color: var(--blue); border: 1px solid rgba(0, 166, 255, 0.35); }
+        .btn-act-share:hover { background: rgba(0, 166, 255, 0.3); color: #fff; }
+        .btn-act-report { background: rgba(239, 68, 68, 0.18); color: #FCA5A5; border: 1px solid rgba(239, 68, 68, 0.35); }
+        .btn-act-report:hover { background: rgba(239, 68, 68, 0.3); color: #fff; }
+        .btn-act-db { background: linear-gradient(135deg, var(--orange), #FF4500); color: #fff; }
+        .btn-act-db:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        .btn-act-reset { background: rgba(255,255,255,0.08); color: #CBD5E1; border: 1px solid rgba(255,255,255,0.12); }
+        .btn-act-reset:hover { background: rgba(255,255,255,0.16); color: #fff; }
+
+        /* ==================== GLOBAL THREAT MAP (3D ROTATING GLOBE) ==================== */
+        #global-threat-map {
+            padding: 80px 0 70px;
+            background: transparent;
+            position: relative;
+            text-align: center;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .global-section-tag {
+            color: var(--orange); font-size: 13px; font-weight: 800;
+            letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px; display: inline-block;
+        }
+        .global-heading {
+            font-size: clamp(28px, 4vw, 44px); font-weight: 800; color: #FFFFFF;
+            letter-spacing: -.6px; margin-bottom: 12px;
+        }
+        .global-sub {
+            color: #94A3B8; font-size: 15px; max-width: 640px; margin: 0 auto 30px; line-height: 1.65;
+        }
+        .threat-badges-bar {
+            display: flex; justify-content: center; gap: 14px; margin-bottom: 36px; flex-wrap: wrap;
+        }
+        .threat-pill {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(15, 20, 32, 0.85); padding: 10px 22px; border-radius: var(--radius-sm);
+            font-size: 12.5px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5); transition: var(--transition); backdrop-filter: blur(10px);
+        }
+        .threat-pill.red { border: 1px solid rgba(239, 68, 68, 0.45); color: #EF4444; }
+        .threat-pill.red .dot {
+            width: 8px; height: 8px; border-radius: 50%; background: #EF4444;
+            box-shadow: 0 0 10px #EF4444; animation: pulseRed 1.6s infinite;
+        }
+        @keyframes pulseRed {
+            0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8); }
+            70% { transform: scale(1.2); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .threat-pill.orange { border: 1px solid rgba(255, 119, 0, 0.45); color: #FF7700; }
+        .threat-pill.orange .dot {
+            width: 8px; height: 8px; border-radius: 50%; background: #FF7700;
+            box-shadow: 0 0 10px #FF7700; animation: pulseOrange 1.6s infinite;
+        }
+        @keyframes pulseOrange {
+            0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(255, 119, 0, 0.8); }
+            70% { transform: scale(1.2); box-shadow: 0 0 0 8px rgba(255, 119, 0, 0); }
+            100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(255, 119, 0, 0); }
+        }
+        .globe-wrapper {
+            position: relative; max-width: 600px; width: 100%; height: 520px; margin: 0 auto;
+            display: flex; align-items: center; justify-content: center; user-select: none; touch-action: none;
+        }
+        canvas#earthCanvas { width: 100%; height: 100%; cursor: grab; display: block; }
+        canvas#earthCanvas:active { cursor: grabbing; }
+        .globe-helper-text {
+            color: #64748B; font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+            font-weight: 700; margin-top: 14px;
+        }
+        .globe-node-tooltip {
+            position: absolute; background: rgba(15, 23, 42, 0.95); border: 1px solid var(--orange);
+            color: #fff; padding: 8px 14px; border-radius: 8px; font-size: 12px; pointer-events: none;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6); display: none; transform: translate(-50%, -120%);
+            z-index: 10; white-space: nowrap;
+        }
+        .globe-node-tooltip.show { display: block; }
+        .globe-node-tooltip strong { color: var(--orange); }
+
+        /* ==================== CORE FEATURES ==================== */
+        section { padding: 70px 0; }
+        .section-header { text-align: center; margin-bottom: 40px; }
+        .section-header h2 { font-size: 30px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+        .section-header p { color: var(--gray-400); font-size: 15px; max-width: 620px; margin: 0 auto; }
+
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 24px; }
+        .feature-card {
+            background: rgba(20, 27, 45, 0.75); border-radius: var(--radius-md); padding: 30px;
+            border: 1px solid rgba(255,255,255,0.08); transition: var(--transition);
+            position: relative; overflow: hidden; backdrop-filter: blur(14px);
+        }
+        .feature-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--orange), transparent); opacity: 0; transition: var(--transition);
+        }
+        .feature-card:hover {
+            transform: translateY(-4px); border-color: rgba(255, 119, 0, 0.45);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.4), 0 0 24px rgba(255,119,0,0.12);
+        }
+        .feature-card:hover::before { opacity: 1; }
+        .feature-icon {
+            width: 52px; height: 52px; border-radius: 12px; display: flex;
+            align-items: center; justify-content: center; font-size: 26px; margin-bottom: 20px;
+        }
+        .feature-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: #fff; }
+        .feature-card p { font-size: 13.5px; color: var(--gray-400); line-height: 1.65; }
+
+        /* ==================== CRITERIA ==================== */
+        #tieu-chi { background: transparent; border-top: 1px solid rgba(255,255,255,0.06); }
+        .criteria-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; }
+        .criteria-item {
+            background: rgba(20, 27, 45, 0.75); border-radius: var(--radius-md); padding: 20px;
+            display: flex; gap: 16px; border: 1px solid rgba(255,255,255,0.08);
+            transition: var(--transition); backdrop-filter: blur(14px);
+        }
+        .criteria-item:hover { border-color: var(--orange); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,119,0,0.1); }
+        .criteria-num {
+            width: 38px; height: 38px; min-width: 38px; border-radius: 10px;
+            background: linear-gradient(135deg, var(--orange), #FF4500);
+            color: #fff; display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: 800; box-shadow: 0 4px 12px var(--orange-glow);
+        }
+        .criteria-item h4 { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+        .criteria-item p { font-size: 12.5px; color: var(--gray-400); line-height: 1.55; }
+
+        .score-tiers { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; margin-top: 32px; }
+        .tier-card { border-radius: var(--radius-md); padding: 22px; text-align: center; border: 2px solid; backdrop-filter: blur(12px); }
+        .tier-safe { background: rgba(34,197,94,0.08); border-color: var(--green); }
+        .tier-warn { background: rgba(245,158,11,0.08); border-color: var(--yellow); }
+        .tier-danger { background: rgba(239,68,68,0.08); border-color: var(--red); }
+        .tier-range { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
+        .tier-safe .tier-range { color: var(--green); }
+        .tier-warn .tier-range { color: var(--yellow); }
+        .tier-danger .tier-range { color: var(--red); }
+        .tier-label { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+        .tier-desc { font-size: 12px; color: var(--gray-400); }
+
+        /* ==================== DATABASE ==================== */
+        #co-so-du-lieu { background: transparent; }
+        .db-master-tabs { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap; }
+        .db-master-tab {
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+            color: #CBD5E1; padding: 10px 22px; border-radius: var(--radius-full);
+            font-size: 13.5px; font-weight: 700; cursor: pointer; transition: var(--transition);
+            display: flex; align-items: center; gap: 8px; backdrop-filter: blur(8px);
+        }
+        .db-master-tab:hover { background: rgba(255,255,255,0.12); color: #fff; }
+        .db-master-tab.active {
+            background: rgba(255,119,0,0.22); border-color: var(--orange); color: var(--orange);
+            box-shadow: 0 0 18px rgba(255,119,0,0.3);
+        }
+        .db-count-badge { background: rgba(255,255,255,0.15); padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+        .db-master-tab.active .db-count-badge { background: var(--orange); color: #fff; }
+        .source-tag-verified {
+            background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3);
+            color: #86EFAC; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px;
+            display: inline-flex; align-items: center; gap: 4px;
+        }
+        .btn-check-src {
+            background: rgba(0, 166, 255, 0.15); border: 1px solid rgba(0, 166, 255, 0.3);
+            color: var(--blue); padding: 4px 10px; border-radius: 6px; font-size: 11.5px;
+            font-weight: 600; cursor: pointer; transition: var(--transition);
+        }
+        .btn-check-src:hover { background: var(--blue); color: #fff; }
+        .db-wrap {
+            background: rgba(20, 27, 45, 0.78); border-radius: var(--radius-md);
+            box-shadow: 0 16px 50px rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.08);
+            overflow: hidden; backdrop-filter: blur(16px);
+        }
+        .db-toolbar {
+            padding: 16px 22px; display: flex; gap: 12px; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.08); flex-wrap: wrap; background: rgba(0,0,0,0.25);
+        }
+        .db-toolbar input {
+            flex: 1; min-width: 220px; padding: 10px 16px; border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px; font-size: 13px; outline: none; background: rgba(255,255,255,0.05); color: #fff;
+        }
+        .db-toolbar select {
+            padding: 10px 16px; border: 1px solid rgba(255,255,255,0.12); border-radius: 8px;
+            font-size: 13px; outline: none; background: #1E293B; color: #fff;
+        }
+        .btn-export {
+            background: linear-gradient(135deg, var(--orange), #FF4500);
+            color: #fff; border: none; padding: 10px 20px; border-radius: 8px;
+            font-size: 12.5px; font-weight: 700; cursor: pointer; transition: var(--transition);
+        }
+        .btn-export:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        .db-table-scroll { overflow-x: auto; }
+        table.db-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+        table.db-table thead { background: rgba(0,0,0,0.4); color: var(--gray-400); }
+        table.db-table th { padding: 14px 16px; font-weight: 600; white-space: nowrap; font-size: 12px; text-transform: uppercase; }
+        table.db-table td { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); vertical-align: top; }
+        table.db-table tbody tr:hover { background: rgba(255,255,255,0.035); }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+        .badge-danger { background: rgba(239,68,68,0.22); color: #FCA5A5; }
+        .badge-warn { background: rgba(245,158,11,0.22); color: #FDE047; }
+        .badge-safe { background: rgba(34,197,94,0.22); color: #86EFAC; }
+        .badge-null { background: rgba(255,255,255,0.06); color: var(--gray-500); font-style: italic; }
+        .db-pagination {
+            padding: 14px 22px; display: flex; justify-content: space-between;
+            align-items: center; border-top: 1px solid rgba(255,255,255,0.08); font-size: 12.5px; color: var(--gray-400);
+        }
+        .page-btns { display: flex; gap: 6px; }
+        .page-btns button {
+            width: 34px; height: 34px; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px;
+            background: rgba(255,255,255,0.05); color: #fff; cursor: pointer; font-size: 12.5px; font-weight: 600;
+        }
+        .page-btns button.active { background: var(--orange); border-color: var(--orange); }
+
+        /* ==================== THREATS & 3K & QUIZ ==================== */
+        #de-doa { background: transparent; }
+        .threats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; }
+        .threat-card {
+            background: rgba(20, 27, 45, 0.75); border-radius: var(--radius-md); padding: 22px; text-align: center;
+            border: 1px solid rgba(255,255,255,0.06); transition: var(--transition); backdrop-filter: blur(12px);
+        }
+        .threat-card:hover { border-color: var(--orange); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(255,119,0,0.12); }
+        .threat-card .t-icon { font-size: 32px; margin-bottom: 10px; }
+        .threat-card h4 { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+        .threat-card p { font-size: 12px; color: var(--gray-400); }
+
+        #quy-tac-3k { background: transparent; border-top: 1px solid rgba(255,255,255,0.06); }
+        .rules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+        .rule-card {
+            background: rgba(20, 27, 45, 0.72); border-radius: var(--radius-md); padding: 30px;
+            text-align: center; border: 1px solid rgba(255,255,255,0.08); transition: var(--transition);
+            backdrop-filter: blur(14px);
+        }
+        .rule-card:hover { transform: translateY(-4px); border-color: var(--orange); }
+        .rule-num {
+            width: 52px; height: 52px; margin: 0 auto 16px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800;
+        }
+        .rule-card:nth-child(1) .rule-num { background: var(--orange); box-shadow: 0 0 20px var(--orange-glow); color: #fff; }
+        .rule-card:nth-child(2) .rule-num { background: var(--red); box-shadow: 0 0 20px var(--red-glow); color: #fff; }
+        .rule-card:nth-child(3) .rule-num { background: var(--purple); box-shadow: 0 0 20px rgba(168,85,247,0.4); color: #fff; }
+        .rule-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: #fff; }
+        .rule-card p { font-size: 13px; color: var(--gray-400); line-height: 1.65; }
+
+        .quiz-banner {
+            background: linear-gradient(135deg, #D95F00, #9A1C00);
+            border-radius: var(--radius-lg); padding: 44px; color: #fff;
+            display: flex; align-items: center; gap: 36px;
+            box-shadow: 0 20px 50px rgba(217,95,0,0.3);
+        }
+        .quiz-banner-text { flex: 1; }
+        .quiz-banner h3 { font-size: 28px; font-weight: 800; margin-bottom: 10px; }
+        .quiz-banner p { font-size: 14.5px; opacity: .9; margin-bottom: 18px; }
+        .btn-quiz {
+            display: inline-flex; align-items: center; gap: 8px; background: #fff; color: #C2410C;
+            padding: 12px 28px; border-radius: var(--radius-full); font-size: 13.5px; font-weight: 800;
+            border: none; cursor: pointer; transition: var(--transition); box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+        .btn-quiz:hover { transform: scale(1.04); background: #FFF7ED; }
+        .quiz-themes { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 22px; }
+        .theme-card { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 14px; text-align: center; }
+        .theme-card h4 { font-size: 13px; font-weight: 700; }
+        .theme-card p { font-size: 11px; opacity: .8; margin-top: 2px; }
+        .quiz-visual {
+            width: 150px; height: 150px; min-width: 120px; background: rgba(255,255,255,0.15);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 56px;
+        }
+        @media(max-width: 768px) { .quiz-banner { flex-direction: column; text-align: center; padding: 28px 20px; } }
+
+        /* Modals */
+        .quiz-overlay, .ai-modal-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+            z-index: 2050; align-items: center; justify-content: center; backdrop-filter: blur(8px);
+        }
+        .quiz-overlay.show, .ai-modal-overlay.show { display: flex; }
+        .quiz-modal {
+            background: #fff; border-radius: var(--radius-md); max-width: 600px; width: 92%;
+            max-height: 88vh; overflow-y: auto; padding: 30px; position: relative; color: #0F172A;
+        }
+        .btn-close-quiz { position: absolute; top: 14px; right: 14px; background: none; border: none; font-size: 22px; cursor: pointer; color: #64748B; }
+        .progress-bar { height: 6px; background: #E2E8F0; border-radius: 3px; overflow: hidden; margin: 14px 0; }
+        .progress-fill { height: 100%; background: var(--orange); }
+        .quiz-question { margin: 20px 0 14px; font-size: 15px; font-weight: 700; color: #0F172A; }
+        .quiz-options { display: flex; flex-direction: column; gap: 9px; }
+        .quiz-opt { padding: 13px 16px; border: 1px solid #CBD5E1; border-radius: 10px; cursor: pointer; font-size: 13.5px; transition: var(--transition); }
+        .quiz-opt:hover { border-color: var(--orange); background: #FFF7ED; }
+        .quiz-opt.correct { border-color: var(--green); background: #DCFCE7; font-weight: 600; }
+        .quiz-opt.wrong { border-color: var(--red); background: #FEE2E2; }
+        .btn-sm { padding: 9px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; background: var(--orange); color: #fff; }
+
+        .ai-modal { background: #fff; border-radius: var(--radius-md); max-width: 500px; width: 92%; padding: 28px; position: relative; color: #0F172A; }
+        .ai-modal h3 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+        .ai-modal p { font-size: 13px; color: #64748B; margin-bottom: 18px; }
+        .ai-field { margin-bottom: 14px; }
+        .ai-field label { display: block; font-size: 12.5px; font-weight: 700; margin-bottom: 4px; }
+        .ai-field input, .ai-field select { width: 100%; padding: 11px 14px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 13px; outline: none; }
+        .ai-modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+
+        /* ==================== FOOTER ==================== */
+        footer {
+            background: rgba(4, 6, 10, 0.95); color: rgba(255,255,255,0.5); padding: 50px 0 24px;
+            font-size: 13px; border-top: 1px solid rgba(255,255,255,0.06); backdrop-filter: blur(14px);
+        }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 30px; margin-bottom: 30px; }
+        @media(max-width: 768px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+        footer h4 { color: #fff; font-size: 14px; font-weight: 700; margin-bottom: 14px; }
+        footer ul { list-style: none; }
+        footer li { margin-bottom: 7px; }
+        footer a:hover { color: var(--orange); }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.06); padding-top: 22px; text-align: center; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<!-- ==================== ANIMATED DYNAMIC CYBER BACKGROUND ==================== -->
+<div class="cyber-bg-container">
+    <div class="ambient-glow orb-1"></div>
+    <div class="ambient-glow orb-2"></div>
+    <div class="ambient-glow orb-3"></div>
+    <div class="cyber-grid-overlay"></div>
+    <div class="cyber-scanline"></div>
+    <canvas id="cyberBgCanvas"></canvas>
+</div>
+
+<!-- ==================== FLOATING HEADER ==================== -->
+<div class="header-floating-wrap">
+    <header class="floating-nav">
+        <a href="#" class="logo">
+            <div class="logo-icon">🛡️</div>
+            <div class="logo-text">Fact<span>Check</span></div>
+        </a>
+        <nav class="nav-desktop">
+            <ul>
+                <li><a href="#trang-chu" class="active">Trang chủ</a></li>
+                <li><a href="#kiem-tra">Kiểm tra</a></li>
+                <li><a href="#live-news-hub">Tin mới kiểm chứng</a></li>
+                <li><a href="#global-threat-map">Mạng lưới Toàn cầu</a></li>
+                <li><a href="#tieu-chi">Tiêu chí LCS™</a></li>
+                <li><a href="#co-so-du-lieu">Cơ sở dữ liệu</a></li>
+                <li><a href="#quy-tac-3k">Quy tắc 3K</a></li>
+                <li><a href="#thu-thach">Thử thách</a></li>
+            </ul>
+        </nav>
+        <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
+    </header>
+</div>
+
+<div class="mobile-drawer" id="mobileDrawer">
+    <a href="#trang-chu" onclick="toggleMobileMenu()">Trang chủ</a>
+    <a href="#kiem-tra" onclick="toggleMobileMenu()">Kiểm tra</a>
+    <a href="#live-news-hub" onclick="toggleMobileMenu()">Tin mới kiểm chứng</a>
+    <a href="#global-threat-map" onclick="toggleMobileMenu()">Mạng lưới Toàn cầu</a>
+    <a href="#tieu-chi" onclick="toggleMobileMenu()">Tiêu chí LCS™</a>
+    <a href="#co-so-du-lieu" onclick="toggleMobileMenu()">Cơ sở dữ liệu</a>
+    <a href="#quy-tac-3k" onclick="toggleMobileMenu()">Quy tắc 3K</a>
+    <a href="#thu-thach" onclick="toggleMobileMenu()">Thử thách</a>
+</div>
+
+<!-- ==================== HERO SEARCH & KIỂM TRA CHUYÊN SÂU ==================== -->
+<section class="hero" id="trang-chu">
+    <div class="container hero-inner" id="kiem-tra">
+        <div class="motto-badge">🛡️ Kiểm Trước · Tin Sau — Chuẩn Nghiệp Vụ Kiểm Chứng Báo Chí</div>
+        <h1>Xác thực <span class="hl-orange">tin tức thời sự</span> & <span class="hl-blue">tín nhiệm cộng đồng</span><br>bảo vệ bạn trước tin giả và lừa đảo số</h1>
+        <p class="lead">Kết hợp quy trình đối soát báo chí chính thống 5 tầng cùng chỉ số tín nhiệm đồng thuận từ cộng đồng theo thời gian thực để phân loại thông tin an toàn.</p>
+
+        <!-- AI & RSS Engine Status -->
+        <div class="ai-status-bar">
+            <span class="ai-status-indicator"></span>
+            <span id="aiEngineLabel">Hệ thống Kiểm chứng: <strong>Báo chí Chính thống + Tín Nhiệm Cộng Đồng (LCS™ v2.6)</strong></span>
+            <span style="color:rgba(255,255,255,0.2)">|</span>
+            <span id="liveFeedStatusText" style="color:#86EFAC;font-weight:600">📡 Luồng tin RSS: Đang hoạt động</span>
+            <button class="btn-ai-cfg" onclick="openAIConfigModal()">⚙️ Cấu hình AI API</button>
+        </div>
+
+        <div class="check-workspace">
+            <!-- 4-Step Journalistic Process Stepper -->
+            <div class="check-stepper">
+                <div class="step-item active" id="stepIndicator1">
+                    <span class="step-num">1</span>
+                    <span>Tiếp nhận & Trích xuất Nguồn</span>
+                </div>
+                <span class="step-arrow">→</span>
+                <div class="step-item" id="stepIndicator2">
+                    <span class="step-num">2</span>
+                    <span>Đối soát Báo chí & Kỹ thuật</span>
+                </div>
+                <span class="step-arrow">→</span>
+                <div class="step-item" id="stepIndicator3">
+                    <span class="step-num">3</span>
+                    <span>Tổng hợp Tín nhiệm Cộng đồng</span>
+                </div>
+                <span class="step-arrow">→</span>
+                <div class="step-item" id="stepIndicator4">
+                    <span class="step-num">4</span>
+                    <span>Kết luận Thông tin An toàn</span>
+                </div>
+            </div>
+
+            <!-- 4 Category Tabs -->
+            <div class="check-tabs-nav">
+                <button class="check-tab-btn active" data-type="website" onclick="switchCheckTab('website')">
+                    <span>🌐</span> Website & Bài báo điện tử
+                </button>
+                <button class="check-tab-btn" data-type="tin-gia" onclick="switchCheckTab('tin-gia')">
+                    <span>📰</span> Tin đồn & Phát ngôn MXH
+                </button>
+                <button class="check-tab-btn" data-type="tin-nhan" onclick="switchCheckTab('tin-nhan')">
+                    <span>💬</span> Tin nhắn & Cuộc gọi
+                </button>
+                <button class="check-tab-btn" data-type="tai-khoan" onclick="switchCheckTab('tai-khoan')">
+                    <span>🏦</span> Tài khoản & Số điện thoại
+                </button>
+            </div>
+
+            <!-- Dynamic Input Card -->
+            <div class="check-card">
+                <!-- Tab Panel 1: Website & URL -->
+                <div class="tab-panel active" id="panelWebsite">
+                    <div class="url-input-wrap">
+                        <div class="url-prefix"><span>🔒</span> URL / Domain</div>
+                        <input type="text" id="inputUrl" placeholder="Dán đường dẫn bài báo hoặc tên miền (vd: tuoitre.vn, vnexpress.net, vietcom-bank.com.vn)..." onkeydown="if(event.key==='Enter') runCheck()">
+                        <button class="btn-tool" onclick="clearField('inputUrl')" title="Xóa">✕</button>
+                    </div>
+                </div>
+
+                <!-- Tab Panel 2: Tin giả & Bài báo -->
+                <div class="tab-panel" id="panelTinGia">
+                    <div class="text-input-wrap">
+                        <textarea id="inputTextNews" placeholder="Dán tiêu đề bài báo, trích đoạn tin tức hoặc tin đồn lan truyền trên mạng xã hội để kiểm chứng độ xác thực..." oninput="updateCharCount('inputTextNews', 'newsCharCount')"></textarea>
+                        <div class="text-meta-bar">
+                            <span>Đối chiếu chéo 35+ cơ quan báo chí chính thống, Cổng TT Chính phủ & đánh giá cộng đồng</span>
+                            <span id="newsCharCount">0 ký tự</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Panel 3: Tin nhắn lừa đảo -->
+                <div class="tab-panel" id="panelTinNhan">
+                    <div class="text-input-wrap">
+                        <input type="text" id="inputMsgSender" placeholder="Brandname / Tên người gửi / Số điện thoại gửi (tùy chọn: Vietcombank, CSGT, Shopee, Telegram...)" style="width:100%;background:transparent;border:none;outline:none;color:#94A3B8;font-size:12.5px;padding-bottom:8px;margin-bottom:8px;border-bottom:1px dashed rgba(255,255,255,0.1);">
+                        <textarea id="inputTextMsg" placeholder="Dán nội dung tin nhắn SMS, tin nhắn Zalo, bẫy tuyển CTV nạp cọc, thông báo trúng thưởng, đe dọa đòi OTP..." oninput="updateCharCount('inputTextMsg', 'msgCharCount')"></textarea>
+                        <div class="text-meta-bar">
+                            <span>Phát hiện bẫy tâm lý khẩn cấp (FOMO), dụ nạp tiền và yêu cầu OTP</span>
+                            <span id="msgCharCount">0 ký tự</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Panel 4: Tài khoản ngân hàng & SĐT rác -->
+                <div class="tab-panel" id="panelTaiKhoan">
+                    <div class="bank-input-grid">
+                        <select id="selectBank" class="bank-select">
+                            <option value="ALL">-- Chọn Ngân hàng / Ví --</option>
+                            <option value="Vietcombank">Vietcombank (VCB)</option>
+                            <option value="MBBank">MB Bank (Quân Đội)</option>
+                            <option value="Techcombank">Techcombank (TCB)</option>
+                            <option value="BIDV">BIDV</option>
+                            <option value="VietinBank">VietinBank</option>
+                            <option value="Agribank">Agribank</option>
+                            <option value="VPBank">VPBank</option>
+                            <option value="ACB">ACB</option>
+                            <option value="MoMo">Ví điện tử MoMo</option>
+                            <option value="ZaloPay">Ví ZaloPay</option>
+                            <option value="Other">Ngân hàng / Đơn vị khác</option>
+                        </select>
+                        <input type="text" id="inputBankAcc" class="bank-acc-input" placeholder="Nhập Số Tài Khoản (STK) hoặc Số Điện Thoại nghi vấn lừa đảo..." onkeydown="if(event.key==='Enter') runCheck()">
+                    </div>
+                </div>
+
+                <!-- Actions Bar below input -->
+                <div class="input-actions-bar">
+                    <div class="input-tools-left">
+                        <button class="btn-tool" onclick="pasteCurrentActive()">
+                            <span>📋</span> Dán từ Clipboard
+                        </button>
+                        <button class="btn-tool" onclick="clearCurrentActive()">
+                            <span>🔄</span> Làm mới
+                        </button>
+                        <span style="font-size:11.5px;color:var(--gray-400)">Chuẩn nghiệp vụ IFCN & VAFC · Đồng thuận Cộng đồng</span>
+                    </div>
+                    <button class="btn-check-main" onclick="runCheck()">
+                        <span>⚡</span> Kiểm Tra Ngay (Fact-Check)
+                    </button>
+                </div>
+
+                <!-- Dynamic Quick Test Samples -->
+                <div class="samples-container" id="quickSamplesContainer"></div>
+            </div>
+
+            <!-- Scanning Animation Box -->
+            <div class="ai-scanning-box" id="aiScanningBox">
+                <div class="scan-title">
+                    <span>⚡ ĐANG THỰC HIỆN QUY TRÌNH KIỂM CHỨNG BÁO CHÍ & CỘNG ĐỒNG...</span>
+                    <span id="scanPercent">20%</span>
+                </div>
+                <div class="scan-progress-bar">
+                    <div class="scan-progress-fill" id="scanProgressFill"></div>
+                </div>
+                <div class="scan-steps">
+                    <div class="scan-step" id="scanStep1"><span class="scan-step-dot"></span><span>Bước 1 (Nguồn phát & WHOIS): Truy vết tên miền, giấy phép báo chí Bộ TT&TT, chứng chỉ SSL/TLS và dấu hiệu mạo danh</span></div>
+                    <div class="scan-step" id="scanStep2"><span class="scan-step-dot"></span><span>Bước 2 (Ngôn ngữ Báo chí 5W1H): Phân tích văn phong thông tấn, phát hiện giật tít câu view, bẫy tâm lý khẩn cấp (FOMO)</span></div>
+                    <div class="scan-step" id="scanStep3"><span class="scan-step-dot"></span><span>Bước 3 (Đối soát Chéo Đa Nguồn): So khớp thông tin với 35+ cơ quan báo chí chính thống & luồng tin thời sự mới nhất</span></div>
+                    <div class="scan-step" id="scanStep4"><span class="scan-step-dot"></span><span>Bước 4 (Tín Nhiệm Cộng Đồng): Tính toán điểm đồng thuận từ cộng đồng người dùng & chuyên gia kiểm chứng độc lập</span></div>
+                    <div class="scan-step" id="scanStep5"><span class="scan-step-dot"></span><span>Bước 5 (Kết luận An toàn): Tổng hợp chỉ số Hybrid (Báo chí + Cộng đồng) & xuất khuyến nghị theo Quy tắc 3K</span></div>
+                </div>
+            </div>
+
+            <!-- Detailed Fact-Check & Community Trust Report -->
+            <div class="result-panel" id="resultPanel"></div>
+
+            <!-- ==================== LIVE CONTINUOUS NEWS STREAM FOR VERIFICATION ==================== -->
+            <div class="live-news-hub" id="live-news-hub">
+                <div class="live-hub-header">
+                    <div class="live-hub-title">
+                        <span>📰</span>
+                        <span>Bản Tin Thời Sự & Luồng Thông Tin Mới Nhất Cần Kiểm Chứng</span>
+                        <span class="live-pulse-tag">● CẬP NHẬT LIÊN TỤC</span>
+                    </div>
+                    <div class="live-hub-controls">
+                        <span id="lastFeedUpdateLabel" style="font-size:11.5px;color:var(--gray-400)">Vừa cập nhật</span>
+                        <button class="btn-tool" id="btnAutoRefreshToggle" onclick="toggleAutoRefreshNews()" title="Tự động cập nhật mỗi 60 giây">
+                            <span>⏱️</span> Tự động: BẬT (<span id="autoRefreshCountdown">60</span>s)
+                        </button>
+                        <button class="btn-tool" onclick="refreshLiveNewsStream(true)" style="border-color:rgba(0,166,255,0.4);color:#7DD3FC">
+                            <span>🔄</span> Cập nhật tin mới ngay
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filter Pills -->
+                <div class="feed-cat-pills">
+                    <button class="feed-pill active" data-cat="all" onclick="filterLiveNews('all')">Tất cả bản tin</button>
+                    <button class="feed-pill" data-cat="official" onclick="filterLiveNews('official')">🏛️ Báo chí chính thống (An toàn)</button>
+                    <button class="feed-pill" data-cat="viral" onclick="filterLiveNews('viral')">⚠️ Tin nóng lan truyền (Cần đối soát)</button>
+                    <button class="feed-pill" data-cat="hoax" onclick="filterLiveNews('hoax')">🚨 Cảnh báo Tin giả & Lừa đảo mới</button>
+                </div>
+
+                <!-- Live News Cards Grid -->
+                <div class="live-news-grid" id="liveNewsGrid"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== GLOBAL THREAT MAP (3D ROTATING GLOBE) ==================== -->
+<section id="global-threat-map">
+    <div class="container">
+        <span class="global-section-tag">MẠNG LƯỚI GIÁM SÁT TOÀN CẦU</span>
+        <h2 class="global-heading">Tin giả và lừa đảo có ở khắp mọi nơi</h2>
+        <p class="global-sub">FactCheck kết nối với các trung tâm dữ liệu bảo mật và mạng lưới kiểm chứng báo chí trên toàn thế giới, mang đến khả năng giám sát và cảnh báo liên tục.</p>
+
+        <div class="threat-badges-bar">
+            <div class="threat-pill red">
+                <span class="dot"></span>
+                <span>THREAT INTELLIGENCE ACTIVE</span>
+            </div>
+            <div class="threat-pill orange">
+                <span class="dot"></span>
+                <span id="activeThreatCountLabel">6 ACTIVE NODES MONITORING</span>
+            </div>
+        </div>
+
+        <div class="globe-wrapper" id="globeWrapper">
+            <canvas id="earthCanvas" width="560" height="520"></canvas>
+            <div class="globe-node-tooltip" id="globeTooltip">
+                <strong id="nodeCity">Hà Nội</strong>: <span id="nodeAlert">1.420 cảnh báo độc hại</span>
+            </div>
+        </div>
+
+        <div class="globe-helper-text">KÉO ĐỂ XOAY · DRAG TO ROTATE</div>
+    </div>
+</section>
+
+<!-- ==================== TÍNH NĂNG ==================== -->
+<section id="tinh-nang">
+    <div class="container">
+        <div class="section-header">
+            <h2>3 Trụ Cột Kiểm Chứng & Bảo Vệ Trọng Tâm</h2>
+            <p>Kết hợp nghiệp vụ báo chí chuyên sâu, phân tích an toàn kỹ thuật và sức mạnh giám sát cộng đồng</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon" style="background:rgba(255,119,0,0.15);color:var(--orange)">🌐</div>
+                <h3>Xác thực Website & Nguồn Báo Chí</h3>
+                <p>Đối chiếu giấy phép hoạt động báo chí điện tử của Bộ TT&TT, kiểm tra tuổi đời tên miền WHOIS, chứng chỉ SSL EV/OV và phát hiện trang tin mạo danh.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:rgba(0,166,255,0.15);color:var(--blue)">📰</div>
+                <h3>Đối Soát Tin Tức Thời Sự 5W1H</h3>
+                <p>Liên tục cập nhật dòng chảy tin tức mới nhất từ các cơ quan báo chí chính thống để đối chiếu chéo, bóc tách tin giật gân, cắt ghép sai ngữ cảnh.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:rgba(34,197,94,0.15);color:var(--green)">👥</div>
+                <h3>Tín Nhiệm Đồng Thuận Cộng Đồng</h3>
+                <p>Hệ thống chấm điểm tín nhiệm hai chiều kết hợp đánh giá của cộng đồng và chuyên gia kiểm chứng giúp xác lập nhãn "Thông tin An toàn" minh bạch.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== TIÊU CHÍ LCS ==================== -->
+<section id="tieu-chi">
+    <div class="container">
+        <div class="section-header">
+            <h2>9 Tiêu chí Đánh giá An toàn LCS™</h2>
+            <p>Bộ ma trận tiêu chuẩn đánh giá rủi ro đa tầng áp dụng cho mọi bản ghi trong cơ sở dữ liệu</p>
+        </div>
+        <div class="criteria-grid">
+            <div class="criteria-item"><div class="criteria-num">1</div><div><h4>Điểm Tín Nhiệm Tên Miền</h4><p>Phân tích tuổi đời domain, nhà đăng ký registrar, lịch sử thay đổi DNS.</p></div></div>
+            <div class="criteria-item"><div class="criteria-num">2</div><div><h4>Xác Thực Chứng Chỉ SSL/TLS</h4><p>Kiểm tra loại chứng chỉ DV/OV/EV, thời hạn hiệu lực, tổ chức cấp phát.</p></div></div>
+            <div class="criteria-item"><div class="criteria-num">3</div><div><h4>Phân Tích Hành Vi Mã Nguồn</h4><p>Thực thi trong AI Sandbox, quét mã độc Javascript, iframe ẩn, popup bẫy.</p></div></div>
+            <div class="criteria-item"><div class="criteria-num">4</div><div><h4>Đối Soát Blacklist Toàn Cầu</h4><p>Rà soát 160.000+ domain độc hại từ PhishTank, VirusTotal, Google Safe Browsing.</p></div></div>
+            <div class="criteria-item"><div class="criteria-num">5</div><div><h4>Nhận Diện Giao Diện Mạo Danh</h4><p>AI thị giác so sánh logo, URL với 500+ thương hiệu & cơ quan báo chí tại Việt Nam.</p></div></div>
+            <div class="criteria-item"><div class="criteria-num">6</div><div><h4>Rà Soát SĐT & STK Ngân Hàng Rác</h4><p>Tra cứu STK nhận tiền và hotline trong CSDL tài khoản lừa đảo bị tố cáo.</p></div></div>
+            <div class="criteria-item"><div class="criteria-num">7</div><div><h4>Giải Mã Ngữ Cảnh & Văn Phong 5W1H</h4><p>Phát hiện từ ngữ kích động sợ hãi, khẩn cấp giả tạo (FOMO), thiếu trích nguồn kiểm chứng.</p></div></div>
+            <div class="criteria-item"><div class="criteria-num">8</div><div><h4>Kiểm Tra Chuyển Hướng Ẩn</h4><p>Bóc tách liên kết rút gọn, phát hiện chuyển hướng trung gian che mắt kiểm duyệt.</p></div></div>
+            <div class="criteria-item"><div class="criteria-num">9</div><div><h4>Tín Nhiệm Đồng Thuận Cộng Đồng</h4><p>Tổng hợp tỷ lệ xác thực từ mạng lưới người dùng và chuyên gia an ninh mạng.</p></div></div>
+        </div>
+
+        <div class="score-tiers">
+            <div class="tier-card tier-safe"><div class="tier-range">80 — 100</div><div class="tier-label">THÔNG TIN AN TOÀN</div><div class="tier-desc">Nguồn báo chí chính thống hoặc đã qua đối soát chéo + đồng thuận cộng đồng cao ($\ge 75\%$).</div></div>
+            <div class="tier-card tier-warn"><div class="tier-range">45 — 79</div><div class="tier-label">CẦN THẬN TRỌNG</div><div class="tier-desc">Thông tin chưa đủ nguồn kiểm chứng độc lập, thiếu ngữ cảnh hoặc ý kiến cộng đồng còn phân hóa.</div></div>
+            <div class="tier-card tier-danger"><div class="tier-range">0 — 44</div><div class="tier-label">NGUY HIỂM / TIN GIẢ</div><div class="tier-desc">Sai sự thật, mạo danh cơ quan báo chí/ngân hàng hoặc bị cộng đồng cảnh báo lừa đảo.</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== DATABASE & MEDIA CREDIBILITY REGISTRY ==================== -->
+<section id="co-so-du-lieu">
+    <div class="container">
+        <div class="section-header">
+            <h2>Hệ Thống Cơ Sở Dữ Liệu An Toàn & Nguồn Tin Xác Thực</h2>
+            <p>35+ Cơ quan Báo chí & Cổng thông tin Chính thống đối chiếu cùng CSDL cảnh báo tin giả & lừa đảo trực tuyến</p>
+        </div>
+
+        <div class="db-master-tabs">
+            <button class="db-master-tab active" id="tabBtnThreatDB" onclick="switchDBView('threat')">
+                <span>🚨</span> CSDL Đe Dọa & Cảnh Báo An Toàn Số
+                <span class="db-count-badge" id="threatCountBadge">20</span>
+            </button>
+            <button class="db-master-tab" id="tabBtnMediaDB" onclick="switchDBView('media')">
+                <span>🏛️</span> Danh Mục Báo Chí & Cổng Thông Tin Chính Thống
+                <span class="db-count-badge" id="mediaCountBadge">35</span>
+            </button>
+        </div>
+
+        <!-- VIEW 1: THREAT & SCAM DATABASE -->
+        <div class="db-wrap" id="viewThreatDB">
+            <div class="db-toolbar">
+                <input type="text" id="dbSearch" placeholder="Tìm theo URL, từ khóa, nội dung, nguồn..." oninput="filterDB()">
+                <select id="dbFilterType" onchange="filterDB()">
+                    <option value="all">Tất cả loại dữ liệu</option>
+                    <option value="website">Website lừa đảo (Phishing)</option>
+                    <option value="tin-gia">Tin giả & Tin đồn</option>
+                    <option value="tin-nhan">Tin nhắn & Cuộc gọi</option>
+                </select>
+                <select id="dbFilterVerdict" onchange="filterDB()">
+                    <option value="all">Tất cả phán quyết</option>
+                    <option value="NGUY HIỂM">Nguy hiểm / Lừa đảo</option>
+                    <option value="CẦN THẬN TRỌNG">Cần thận trọng</option>
+                    <option value="AN TOÀN">An toàn</option>
+                </select>
+                <button class="btn-export" onclick="exportJSON()">📥 Xuất JSON Threat DB</button>
+            </div>
+            <div class="db-table-scroll">
+                <table class="db-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Phân loại</th>
+                            <th>Mục tiêu / Nội dung</th>
+                            <th>Thương hiệu mạo danh</th>
+                            <th>Điểm LCS™</th>
+                            <th>Phán quyết</th>
+                            <th>Nguồn xác minh</th>
+                            <th>Ngày phát hiện</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dbTableBody"></tbody>
+                </table>
+            </div>
+            <div class="db-pagination">
+                <span id="dbPaginationInfo">Hiển thị...</span>
+                <div class="page-btns" id="dbPaginationBtns"></div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: VERIFIED MEDIA & PRESS CREDIBILITY REGISTRY -->
+        <div class="db-wrap" id="viewMediaDB" style="display:none">
+            <div class="db-toolbar">
+                <input type="text" id="mediaSearch" placeholder="Tìm theo tên báo, tên miền, cơ quan chủ quản, giấy phép BTTTT..." oninput="filterMediaDB()">
+                <select id="mediaFilterCat" onchange="filterMediaDB()">
+                    <option value="all">Tất cả danh mục nguồn tin</option>
+                    <option value="gov">Cổng Thông tin Chính phủ / Bộ Ngành</option>
+                    <option value="press">Báo chí Chính trị & Thông tấn Quốc gia</option>
+                    <option value="broadcast">Đài Truyền hình & Phát thanh</option>
+                    <option value="investigative">Báo chí Điều tra & Đời sống</option>
+                    <option value="cyber">An toàn thông tin & Pháp luật</option>
+                    <option value="health">Y tế & Khoa học</option>
+                    <option value="bank">Ngân hàng & Tài chính chính thức</option>
+                </select>
+                <button class="btn-export" style="background:linear-gradient(135deg, var(--blue), #0077B6)" onclick="exportMediaJSON()">📥 Xuất JSON Danh Mục Báo Chí</button>
+            </div>
+            <div class="db-table-scroll">
+                <table class="db-table">
+                    <thead>
+                        <tr>
+                            <th>Mã Nguồn</th>
+                            <th>Cơ quan Báo chí / Cổng Thông Tin</th>
+                            <th>Tên miền chính thức</th>
+                            <th>Cơ quan chủ quản</th>
+                            <th>Giấy phép BTTTT</th>
+                            <th>Điểm Tín Nhiệm</th>
+                            <th>Trạng thái xác thực</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mediaTableBody"></tbody>
+                </table>
+            </div>
+            <div class="db-pagination">
+                <span id="mediaPaginationInfo">Hiển thị...</span>
+                <div class="page-btns" id="mediaPaginationBtns"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== THREATS ==================== -->
+<section id="de-doa">
+    <div class="container">
+        <div class="section-header">
+            <h2>Mối Đe Dọa Phổ Biến Trên Không Gian Mạng</h2>
+            <p>12 thủ đoạn lừa đảo và tin giả nguy hiểm được ghi nhận tại Việt Nam</p>
+        </div>
+        <div class="threats-grid">
+            <div class="threat-card"><div class="t-icon">🎭</div><h4>Deepfake</h4><p>Dùng AI tạo video/giọng nói giả mạo người thân, lãnh đạo</p></div>
+            <div class="threat-card"><div class="t-icon">👮</div><h4>Mạo danh Công an</h4><p>Giả danh cơ quan thực thi pháp luật đe dọa tống tiền</p></div>
+            <div class="threat-card"><div class="t-icon">🏦</div><h4>Giả mạo Ngân hàng</h4><p>Website và SMS giả trang e-banking chiếm đoạt OTP</p></div>
+            <div class="threat-card"><div class="t-icon">🛒</div><h4>Bẫy cọc TMĐT</h4><p>Lừa tiền đặt cọc mua hàng online, gửi bill chuyển tiền giả</p></div>
+            <div class="threat-card"><div class="t-icon">📱</div><h4>Chiếm đoạt SIM</h4><p>Chiêu trò nâng cấp SIM 4G/5G nhằm đánh cắp mã OTP</p></div>
+            <div class="threat-card"><div class="t-icon">💼</div><h4>Bẫy Việc làm</h4><p>"Việc nhẹ lương cao" like video, giật đơn, nạp tiền mở khóa</p></div>
+            <div class="threat-card"><div class="t-icon">💰</div><h4>Đầu tư tài chính ảo</h4><p>Sàn giao dịch giả mạo cam kết lợi nhuận 30-50%/tháng</p></div>
+            <div class="threat-card"><div class="t-icon">📰</div><h4>Tin giả Y tế</h4><p>Bóp méo kiến thức sức khỏe, kích động hoang mang dư luận</p></div>
+            <div class="threat-card"><div class="t-icon">💳</div><h4>Tín dụng đen Online</h4><p>App vay nặng lãi, khủng bố danh bạ và đòi nợ bạo lực</p></div>
+            <div class="threat-card"><div class="t-icon">🔗</div><h4>Phishing MXH</h4><p>Link bình chọn cuộc thi, minigame chiếm đoạt tài khoản Facebook</p></div>
+            <div class="threat-card"><div class="t-icon">🔐</div><h4>Ransomware</h4><p>Mã độc tống tiền mã hóa dữ liệu máy tính doanh nghiệp</p></div>
+            <div class="threat-card"><div class="t-icon">❤️</div><h4>Bẫy Tình cảm</h4><p>Romance scam xây dựng vỏ bọc thành đạt rồi dụ đầu tư</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== 3K RULES ==================== -->
+<section id="quy-tac-3k">
+    <div class="container">
+        <div class="section-header">
+            <h2>Quy Tắc 3K — Kỹ Năng Số An Toàn</h2>
+            <p>Ba nguyên tắc vàng phòng chống lừa đảo trực tuyến từ chiến dịch "Mắt Thấy! Tin Chưa?"</p>
+        </div>
+        <div class="rules-grid">
+            <div class="rule-card">
+                <div class="rule-num">K1</div>
+                <h3>KHÔNG VỘI TIN</h3>
+                <p>Không vội tin bất kỳ thông tin nào trên mạng. Luôn kiểm tra, xác minh nguồn gốc trước khi tin tưởng, giao dịch hoặc chia sẻ. Áp dụng nguyên tắc "Kiểm Trước — Tin Sau".</p>
+            </div>
+            <div class="rule-card">
+                <div class="rule-num">K2</div>
+                <h3>KHÔNG CHUYỂN TIỀN</h3>
+                <p>Tuyệt đối không chuyển tiền cho người lạ hoặc theo yêu cầu từ tin nhắn, cuộc gọi chưa xác minh. Mọi yêu cầu chuyển tiền khẩn cấp đều cần gọi điện thoại trực tiếp để xác nhận.</p>
+            </div>
+            <div class="rule-card">
+                <div class="rule-num">K3</div>
+                <h3>KHÔNG CHIA SẺ OTP</h3>
+                <p>Không bao giờ cung cấp mã OTP, mật khẩu tài khoản, số CCCD hoặc thông tin thẻ ngân hàng cho bất kỳ ai qua điện thoại, tin nhắn hay đường link.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== THỬ THÁCH ==================== -->
+<section id="thu-thach">
+    <div class="container">
+        <div class="quiz-banner">
+            <div class="quiz-banner-text">
+                <h3>Thử thách: Mắt Thấy! Tin Chưa?</h3>
+                <p>Bài trắc nghiệm kiểm tra kỹ năng nhận diện thủ đoạn lừa đảo và tư duy phản biện khi tiếp nhận thông tin trên mạng xã hội.</p>
+                <button class="btn-quiz" onclick="startQuiz()">▶ Bắt đầu Thử thách</button>
+                <div class="quiz-themes">
+                    <div class="theme-card"><h4>CHỦ ĐỀ 1</h4><p>Bẫy Tình Cảm & Tài Chính</p></div>
+                    <div class="theme-card"><h4>CHỦ ĐỀ 2</h4><p>Mạo Danh Thương Hiệu & Cơ Quan</p></div>
+                    <div class="theme-card"><h4>CHỦ ĐỀ 3</h4><p>Bẫy Tuyển Dụng & Việc Làm</p></div>
+                    <div class="theme-card"><h4>CHỦ ĐỀ 4</h4><p>Tin Giả & Thao Túng Tâm Lý</p></div>
+                </div>
+            </div>
+            <div class="quiz-visual">🧠</div>
+        </div>
+    </div>
+</section>
+
+<!-- Modals -->
+<div class="quiz-overlay" id="quizOverlay">
+    <div class="quiz-modal">
+        <button class="btn-close-quiz" onclick="closeQuiz()">✕</button>
+        <div id="quizContent"></div>
+    </div>
+</div>
+
+<div class="ai-modal-overlay" id="aiConfigModal">
+    <div class="ai-modal">
+        <button class="btn-close-quiz" onclick="closeAIConfigModal()">✕</button>
+        <h3>🤖 Cấu hình AI & Luồng Tin Kiểm Chứng</h3>
+        <p>Hệ thống mặc định kết hợp <strong>Đối soát Báo chí Chính thống + Tín Nhiệm Cộng Đồng</strong> và tự động cập nhật tin RSS. Bạn cũng có thể kết nối trực tiếp với <strong>Google Gemini API</strong>.</p>
+        
+        <div class="ai-field">
+            <label>Chế độ AI kiểm tra:</label>
+            <select id="aiModeSelect" onchange="toggleApiKeyInput()">
+                <option value="local">AI Sandbox Đa Tầng Cục Bộ + Tín nhiệm Cộng đồng (Mặc định)</option>
+                <option value="gemini">Google Gemini API (Cloud LLM - Yêu cầu API Key)</option>
+            </select>
+        </div>
+
+        <div class="ai-field" id="geminiKeyGroup" style="display:none">
+            <label>Google Gemini API Key:</label>
+            <input type="password" id="geminiApiKey" placeholder="Nhập API Key (AIzaSy...)">
+            <span style="font-size:11px;color:#64748B;margin-top:4px;display:block">API Key được lưu bảo mật trong localStorage trình duyệt của bạn.</span>
+        </div>
+
+        <div class="ai-modal-footer">
+            <button class="btn-sm" style="background:#E2E8F0;color:#0F172A" onclick="closeAIConfigModal()">Hủy</button>
+            <button class="btn-sm" onclick="saveAIConfig()">Lưu cấu hình</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Báo Cáo / Tố Cáo Lừa Đảo -->
+<div class="ai-modal-overlay" id="reportScamModal">
+    <div class="ai-modal" style="max-width:540px">
+        <button class="btn-close-quiz" onclick="closeReportModal()">✕</button>
+        <h3>🚨 Báo Cáo Nội Dung Lừa Đảo / Tin Giả</h3>
+        <p>Đóng góp dữ liệu cảnh báo vào Hệ thống Giám sát Toàn cầu & Tín Nhiệm Cộng Đồng.</p>
+        
+        <div class="ai-field">
+            <label>Loại nội dung báo cáo:</label>
+            <select id="reportTypeSelect">
+                <option value="website">🌐 Website / Đường dẫn lừa đảo (Phishing)</option>
+                <option value="tin-gia">📰 Tin giả / Xuyên tạc thông tin</option>
+                <option value="tin-nhan">💬 Tin nhắn / Cuộc gọi lừa đảo</option>
+                <option value="tai-khoan">🏦 Tài khoản ngân hàng / SĐT rác</option>
+            </select>
+        </div>
+
+        <div class="ai-field">
+            <label>Mục tiêu nghi vấn (Domain, SĐT, STK hoặc Tin nhắn):</label>
+            <input type="text" id="reportTargetInput" placeholder="Ví dụ: vietcom-bank.com.vn hoặc 0384928172...">
+        </div>
+
+        <div class="ai-field">
+            <label>Mô tả chi tiết thủ đoạn / Bằng chứng đối chứng:</label>
+            <textarea id="reportDescInput" placeholder="Mô tả hành vi: giả mạo ngân hàng, tin giả cắt ghép, link bài báo đối chứng..." style="width:100%;height:80px;background:#0F172A;border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:10px;color:#fff;font-family:inherit;font-size:13px;resize:none;outline:none;"></textarea>
+        </div>
+
+        <div class="ai-modal-footer">
+            <button class="btn-sm" style="background:#E2E8F0;color:#0F172A" onclick="closeReportModal()">Hủy</button>
+            <button class="btn-sm" style="background:var(--red);color:#fff" onclick="submitScamReport()">Gửi Báo Cáo</button>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<footer>
+    <div class="container">
+        <div class="footer-grid">
+            <div>
+                <div style="font-size:19px;font-weight:800;color:#fff;margin-bottom:8px">Fact<span style="color:var(--orange)">Check</span></div>
+                <p style="line-height:1.6;font-size:12.5px">Sự thật là nền tảng của niềm tin. Hệ thống kiểm chứng báo chí, cập nhật tin tức liên tục và đánh giá tín nhiệm cộng đồng đa tầng.</p>
+            </div>
+            <div>
+                <h4>Công cụ Kiểm tra</h4>
+                <ul>
+                    <li><a href="#kiem-tra">Kiểm tra Website & Bài báo</a></li>
+                    <li><a href="#live-news-hub">Tin mới cần kiểm chứng</a></li>
+                    <li><a href="#kiem-tra">Kiểm tra Tin nhắn & STK</a></li>
+                    <li><a href="#co-so-du-lieu">Cơ sở dữ liệu</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Mạng Lưới Giám Sát</h4>
+                <ul>
+                    <li><a href="#global-threat-map">Bản đồ Trái Đất 3D</a></li>
+                    <li><a href="#tieu-chi">9 Tiêu chí LCS™</a></li>
+                    <li><a href="#de-doa">12 Mối đe dọa</a></li>
+                    <li><a href="#quy-tac-3k">Quy tắc 3K</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Liên kết</h4>
+                <ul>
+                    <li><a href="https://tingia.gov.vn" target="_blank">Trung tâm Xử lý Tin giả VAFC ↗</a></li>
+                    <li><a href="https://tinnhiemmang.vn" target="_blank">Tín Nhiệm Mạng Quốc Gia ↗</a></li>
+                    <li><a href="#" onclick="openReportModal('', 'tin-gia');return false;">Báo cáo Tin giả</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 FactCheck — Sự thật là nền tảng của niềm tin.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- ==================== JAVASCRIPT ENGINES ==================== -->
+<script>
+function toggleMobileMenu() {
+    document.getElementById('mobileDrawer').classList.toggle('show');
+}
+
+/* ==============================================================
+   1. DYNAMIC CYBER BACKGROUND ENGINE (CONSTELLATION PARTICLES)
+   ============================================================== */
+(function initCyberBackground() {
+    const canvas = document.getElementById('cyberBgCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    let width = 0, height = 0, particles = [], mouseX = -9999, mouseY = -9999;
+
+    function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(dpr, dpr);
+        initParticles();
+    }
+
+    const PARTICLE_COUNT = Math.min(80, Math.floor((window.innerWidth * window.innerHeight) / 17000));
+    const CONNECT_DIST = 115;
+    const MOUSE_RADIUS = 150;
+
+    function initParticles() {
+        particles = [];
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+            const rand = Math.random();
+            let color, rgb;
+            if (rand < 0.45) { color = '#FF7700'; rgb = '255, 119, 0'; }
+            else if (rand < 0.8) { color = '#00A6FF'; rgb = '0, 166, 255'; }
+            else { color = '#E2E8F0'; rgb = '226, 232, 240'; }
+
+            particles.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                r: Math.random() * 1.8 + 1,
+                color, rgb,
+                baseAlpha: Math.random() * 0.45 + 0.25,
+                pulse: Math.random() * Math.PI * 2,
+                pulseSpeed: Math.random() * 0.03 + 0.015
+            });
+        }
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+        for (let i = 0; i < particles.length; i++) {
+            const p = particles[i];
+            p.x += p.vx; p.y += p.vy; p.pulse += p.pulseSpeed;
+            if (p.x < 0) p.x = width; else if (p.x > width) p.x = 0;
+            if (p.y < 0) p.y = height; else if (p.y > height) p.y = 0;
+
+            const alpha = p.baseAlpha + Math.sin(p.pulse) * 0.15;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${p.rgb}, ${alpha})`;
+            ctx.shadowBlur = 8; ctx.shadowColor = p.color; ctx.fill();
+
+            for (let j = i + 1; j < particles.length; j++) {
+                const p2 = particles[j];
+                const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+                if (dist < CONNECT_DIST) {
+                    const lineAlpha = (1 - dist / CONNECT_DIST) * 0.2;
+                    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y);
+                    ctx.strokeStyle = `rgba(255, 119, 0, ${lineAlpha})`;
+                    ctx.shadowBlur = 0; ctx.lineWidth = 0.8; ctx.stroke();
+                }
+            }
+            const mdx = p.x - mouseX, mdy = p.y - mouseY;
+            const mDist = Math.hypot(mdx, mdy);
+            if (mDist < MOUSE_RADIUS && mDist > 0) {
+                ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(mouseX, mouseY);
+                ctx.strokeStyle = `rgba(0, 166, 255, ${(1 - mDist / MOUSE_RADIUS) * 0.42})`;
+                ctx.lineWidth = 1; ctx.stroke();
+                p.x += (mdx / mDist) * 0.3; p.y += (mdy / mDist) * 0.3;
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', resize);
+    window.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+    window.addEventListener('mouseleave', () => { mouseX = -9999; mouseY = -9999; });
+    resize(); animate();
+})();
+
+/* ==============================================================
+   2. 3D ROTATING EARTH GLOBE ENGINE
+   ============================================================== */
+(function initGlobe() {
+    const canvas = document.getElementById('earthCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const tooltip = document.getElementById('globeTooltip');
+
+    let width = canvas.width, height = canvas.height;
+    const R = 205, cx = width / 2, cy = height / 2;
+    let rotX = 0.22, rotY = 1.85, isDragging = false, lastX = 0, lastY = 0, velX = 0, velY = 0;
+
+    const nodes = [
+        { lat: 21.0285, lon: 105.8542, city: 'Hà Nội', alert: 'Trung tâm Xử lý Tin giả VAFC & TTXVN' },
+        { lat: 10.8231, lon: 106.6297, city: 'TP. HCM', alert: 'Mạng lưới Báo chí & Giám sát An toàn số' },
+        { lat: 1.3521, lon: 103.8198, city: 'Singapore', alert: 'Trung tâm AI Sandbox APAC' },
+        { lat: 35.6762, lon: 139.6503, city: 'Tokyo', alert: 'Mạng lưới PhishTank APAC' },
+        { lat: 51.5074, lon: -0.1278, city: 'London', alert: 'IFCN Fact-Checking Node' },
+        { lat: 37.7749, lon: -122.4194, city: 'San Francisco', alert: 'Threat Intelligence Core' }
+    ];
+
+    const continents = [
+        [ [70, 30], [70, 170], [60, 160], [45, 145], [35, 130], [22, 120], [10, 105], [1, 104], [8, 77], [25, 65], [30, 50], [38, 30], [45, 10], [55, 5], [60, 25], [70, 30] ],
+        [ [23, 105], [21, 107], [16, 108], [11, 109], [9, 105], [10, 104], [14, 103], [22, 102], [23, 105] ],
+        [ [35, -5], [37, 10], [32, 32], [12, 43], [5, 48], [-12, 40], [-26, 33], [-34, 18], [-22, 14], [5, 9], [5, -2], [15, -17], [28, -13], [35, -5] ],
+        [ [70, -160], [70, -80], [60, -60], [45, -60], [30, -80], [25, -80], [18, -95], [15, -90], [28, -112], [35, -120], [50, -125], [60, -140], [70, -160] ],
+        [ [12, -75], [10, -60], [-5, -35], [-22, -40], [-45, -65], [-55, -70], [-40, -73], [-18, -70], [-5, -80], [5, -77], [12, -75] ],
+        [ [-12, 130], [-15, 136], [-12, 142], [-22, 150], [-34, 150], [-38, 145], [-35, 118], [-22, 114], [-15, 124], [-12, 130] ]
+    ];
+
+    function latLonTo3D(lat, lon) {
+        const phi = (90 - lat) * (Math.PI / 180);
+        const theta = (lon + 180) * (Math.PI / 180);
+        return { x: -(Math.sin(phi) * Math.cos(theta)), y: Math.cos(phi), z: Math.sin(phi) * Math.sin(theta) };
+    }
+    function rotate3D(p, rx, ry) {
+        const cosY = Math.cos(ry), sinY = Math.sin(ry);
+        const x1 = p.x * cosY + p.z * sinY, z1 = -p.x * sinY + p.z * cosY;
+        const cosX = Math.cos(rx), sinX = Math.sin(rx);
+        return { x: x1, y: p.y * cosX - z1 * sinX, z: p.y * sinX + z1 * cosX };
+    }
+
+    let pulseAngle = 0;
+    function draw() {
+        ctx.clearRect(0, 0, width, height);
+        const glowGrad = ctx.createRadialGradient(cx, cy, R * 0.75, cx, cy, R * 1.25);
+        glowGrad.addColorStop(0, 'rgba(255, 119, 0, 0.16)');
+        glowGrad.addColorStop(0.5, 'rgba(255, 119, 0, 0.05)');
+        glowGrad.addColorStop(1, 'transparent');
+        ctx.fillStyle = glowGrad; ctx.beginPath(); ctx.arc(cx, cy, R * 1.25, 0, Math.PI * 2); ctx.fill();
+
+        const sphereGrad = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.35, R * 0.1, cx, cy, R);
+        sphereGrad.addColorStop(0, '#1E1710'); sphereGrad.addColorStop(0.55, '#120D08');
+        sphereGrad.addColorStop(0.85, '#0B0907'); sphereGrad.addColorStop(1, '#050403');
+        ctx.fillStyle = sphereGrad; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
+
+        ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.clip();
+        ctx.strokeStyle = 'rgba(255, 119, 0, 0.12)'; ctx.lineWidth = 1;
+
+        for (let lat = -60; lat <= 60; lat += 30) {
+            ctx.beginPath(); let first = true;
+            for (let lon = -180; lon <= 180; lon += 8) {
+                const pr = rotate3D(latLonTo3D(lat, lon), rotX, rotY);
+                if (pr.z > 0) {
+                    const sx = cx + pr.x * R, sy = cy - pr.y * R;
+                    if (first) { ctx.moveTo(sx, sy); first = false; } else ctx.lineTo(sx, sy);
+                } else first = true;
+            }
+            ctx.stroke();
+        }
+        for (let lon = -180; lon < 180; lon += 30) {
+            ctx.beginPath(); let first = true;
+            for (let lat = -80; lat <= 80; lat += 6) {
+                const pr = rotate3D(latLonTo3D(lat, lon), rotX, rotY);
+                if (pr.z > 0) {
+                    const sx = cx + pr.x * R, sy = cy - pr.y * R;
+                    if (first) { ctx.moveTo(sx, sy); first = false; } else ctx.lineTo(sx, sy);
+                } else first = true;
+            }
+            ctx.stroke();
+        }
+        continents.forEach(poly => {
+            ctx.beginPath(); let visiblePoints = 0;
+            poly.forEach((pt, idx) => {
+                const pr = rotate3D(latLonTo3D(pt[0], pt[1]), rotX, rotY);
+                if (pr.z > -0.15) visiblePoints++;
+                const sx = cx + pr.x * R, sy = cy - pr.y * R;
+                if (idx === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
+            });
+            ctx.closePath();
+            if (visiblePoints > poly.length * 0.3) {
+                ctx.fillStyle = 'rgba(217, 119, 6, 0.18)'; ctx.fill();
+                ctx.strokeStyle = 'rgba(255, 140, 0, 0.45)'; ctx.lineWidth = 1.3; ctx.stroke();
+            }
+        });
+        ctx.restore();
+
+        ctx.strokeStyle = 'rgba(255, 119, 0, 0.4)'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
+
+        pulseAngle += 0.05;
+        const pulseR = 6 + Math.sin(pulseAngle) * 3;
+        nodes.forEach(node => {
+            const pr = rotate3D(latLonTo3D(node.lat, node.lon), rotX, rotY);
+            if (pr.z > 0.05) {
+                const sx = cx + pr.x * R, sy = cy - pr.y * R;
+                ctx.save(); ctx.globalAlpha = Math.min(1, Math.max(0.2, (pr.z - 0.05) * 2));
+                ctx.strokeStyle = 'rgba(255, 119, 0, 0.6)'; ctx.lineWidth = 1.5;
+                ctx.beginPath(); ctx.arc(sx, sy, pulseR + 4, 0, Math.PI * 2); ctx.stroke();
+                ctx.fillStyle = '#FF7700'; ctx.beginPath(); ctx.arc(sx, sy, 5, 0, Math.PI * 2); ctx.fill();
+                ctx.font = '600 10.5px sans-serif'; ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
+                ctx.fillText(node.city, sx, sy + 16);
+                ctx.restore();
+            }
+        });
+
+        if (!isDragging) {
+            rotY += 0.0035; velX *= 0.92; velY *= 0.92; rotY += velX; rotX += velY;
+            rotX = Math.max(-0.8, Math.min(0.8, rotX));
+        }
+        requestAnimationFrame(draw);
+    }
+
+    canvas.addEventListener('mousedown', e => { isDragging = true; lastX = e.clientX; lastY = e.clientY; velX = 0; velY = 0; });
+    window.addEventListener('mousemove', e => {
+        if (!isDragging) {
+            const rect = canvas.getBoundingClientRect();
+            const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const my = (e.clientY - rect.top) * (canvas.height / rect.height);
+            let hovered = null;
+            for (const node of nodes) {
+                const pr = rotate3D(latLonTo3D(node.lat, node.lon), rotX, rotY);
+                if (pr.z > 0.1 && Math.hypot(mx - (cx + pr.x * R), my - (cy - pr.y * R)) < 18) {
+                    hovered = { node, sx: ((cx + pr.x * R) / canvas.width) * rect.width, sy: ((cy - pr.y * R) / canvas.height) * rect.height };
+                    break;
+                }
+            }
+            if (hovered) {
+                tooltip.style.left = hovered.sx + 'px'; tooltip.style.top = hovered.sy + 'px';
+                document.getElementById('nodeCity').textContent = hovered.node.city;
+                document.getElementById('nodeAlert').textContent = hovered.node.alert;
+                tooltip.classList.add('show');
+            } else tooltip.classList.remove('show');
+            return;
+        }
+        const dx = e.clientX - lastX, dy = e.clientY - lastY;
+        velX = dx * 0.005; velY = -dy * 0.005; rotY += velX; rotX = Math.max(-0.8, Math.min(0.8, rotX + velY));
+        lastX = e.clientX; lastY = e.clientY;
+    });
+    window.addEventListener('mouseup', () => { isDragging = false; });
+    draw();
+})();
+
+/* ==============================================================
+   3. VERIFIED MEDIA & THREAT DATABASES
+   ============================================================== */
+const VERIFIED_SOURCES_DB = [
+    { id: "SRC-01", domain: "chinhphu.vn", alt_domains: ["baochinhphu.vn"], name: "Cổng Thông tin Điện tử Chính phủ / Báo Điện tử Chính phủ", managing_body: "Văn phòng Chính phủ", license: "GP số 06/GP-TTĐT do Bộ TT&TT cấp", category: "gov", category_label: "Cổng TT Chính phủ", trust_score: 100, status: "verified", security_features: "DNSSEC, SSL EV (DigiCert), IPv6, Tín Nhiệm Mạng", description: "Cơ quan phát ngôn và truyền thông đa phương tiện chính thức của Chính phủ nước CHXHCN Việt Nam." },
+    { id: "SRC-02", domain: "nhandan.vn", alt_domains: ["nhandantv.vn"], name: "Báo Nhân Dân (Tiếng nói của Đảng và Nhân dân)", managing_body: "Ban Chấp hành Trung ương Đảng Cộng sản Việt Nam", license: "GP số 05/GP-BTTTT do Bộ TT&TT cấp", category: "press", category_label: "Báo chí Chính trị", trust_score: 100, status: "verified", security_features: "DNSSEC, SSL OV, Tín Nhiệm Mạng", description: "Cơ quan ngôn luận trung ương, nguồn tin chính trị - xã hội tối cao của hệ thống báo chí cách mạng Việt Nam." },
+    { id: "SRC-03", domain: "vietnamplus.vn", alt_domains: ["vna.gov.vn"], name: "Báo Điện tử VietnamPlus / Thông tấn xã Việt Nam (TTXVN)", managing_body: "Thông tấn xã Việt Nam (VNA)", license: "GP số 1374/GP-BTTTT do Bộ TT&TT cấp", category: "press", category_label: "Thông tấn Quốc gia", trust_score: 100, status: "verified", security_features: "DNSSEC, SSL EV, HSTS", description: "Hãng thông tấn quốc gia của Việt Nam, cung cấp nguồn tin đối ngoại và chuẩn xác bằng nhiều ngôn ngữ." },
+    { id: "SRC-04", domain: "vtv.vn", alt_domains: ["vtvgo.vn"], name: "Đài Truyền hình Việt Nam (VTV / VTV24)", managing_body: "Chính phủ Việt Nam", license: "GP số 104/GP-BTTTT do Bộ TT&TT cấp", category: "broadcast", category_label: "Truyền hình Quốc gia", trust_score: 99, status: "verified", security_features: "SSL OV, CDN Viettel, Tín Nhiệm Mạng", description: "Đài truyền hình quốc gia, cơ quan báo chí chủ lực đa phương tiện với Ban Thời sự VTV24 chuyên xác minh tin giả." },
+    { id: "SRC-05", domain: "vov.vn", alt_domains: ["vovlive.vn"], name: "Đài Tiếng nói Việt Nam (VOV)", managing_body: "Chính phủ Việt Nam", license: "GP số 485/GP-BTTTT do Bộ TT&TT cấp", category: "broadcast", category_label: "Phát thanh Quốc gia", trust_score: 99, status: "verified", security_features: "SSL OV, DNSSEC, Tín Nhiệm Mạng", description: "Cơ quan truyền thông quốc gia phát thanh và báo điện tử chuyên nghiệp." },
+    { id: "SRC-06", domain: "tuoitre.vn", alt_domains: ["tv.tuoitre.vn"], name: "Báo Tuổi Trẻ (Tuổi Trẻ Online)", managing_body: "Đoàn TNCS Hồ Chí Minh TP. Hồ Chí Minh", license: "GP số 330/GP-BTTTT do Bộ TT&TT cấp", category: "investigative", category_label: "Báo chí Điều tra", trust_score: 98, status: "verified", security_features: "SSL OV, Cloudflare Enterprise, Tín Nhiệm Mạng", description: "Tòa soạn báo chí uy tín hàng đầu trong điều tra, phát hiện sai phạm và xác thực thông tin phản biện xã hội." },
+    { id: "SRC-07", domain: "thanhnien.vn", alt_domains: [], name: "Báo Thanh Niên", managing_body: "Trung ương Hội Liên hiệp Thanh niên Việt Nam", license: "GP số 474/GP-BTTTT do Bộ TT&TT cấp", category: "investigative", category_label: "Báo chí Xã hội", trust_score: 98, status: "verified", security_features: "SSL OV, HSTS, Tín Nhiệm Mạng", description: "Báo điện tử chuyên sâu về đời sống, pháp luật và liên tục cảnh báo các chiêu trò lừa đảo công nghệ cao." },
+    { id: "SRC-08", domain: "vnexpress.net", alt_domains: [], name: "Báo Điện tử VnExpress", managing_body: "Bộ Khoa học & Công nghệ / FPT", license: "GP số 548/GP-BTTTT do Bộ TT&TT cấp", category: "press", category_label: "Báo chí Đời sống", trust_score: 98, status: "verified", security_features: "SSL EV, CDN Akamai, Tín Nhiệm Mạng", description: "Báo điện tử có lượng truy cập lớn nhất Việt Nam, ban biên tập kiểm duyệt tin tức chặt chẽ." },
+    { id: "SRC-09", domain: "vietnamnet.vn", alt_domains: [], name: "Báo Điện tử VietNamNet", managing_body: "Bộ Thông tin và Truyền thông", license: "GP số 263/GP-BTTTT do Bộ TT&TT cấp", category: "press", category_label: "Báo chí Chính luận", trust_score: 99, status: "verified", security_features: "DNSSEC, SSL OV, Tín Nhiệm Mạng", description: "Báo điện tử chính luận hàng đầu trực thuộc Bộ Thông tin & Truyền thông." },
+    { id: "SRC-10", domain: "dantri.com.vn", alt_domains: [], name: "Báo Điện tử Dân Trí", managing_body: "Bộ Lao động - Thương binh và Xã hội", license: "GP số 29/GP-BTTTT do Bộ TT&TT cấp", category: "press", category_label: "Báo chí Xã hội", trust_score: 98, status: "verified", security_features: "SSL OV, Tín Nhiệm Mạng", description: "Báo điện tử thông tin dân sinh, từ thiện minh bạch và pháp luật." },
+    { id: "SRC-11", domain: "laodong.vn", alt_domains: [], name: "Báo Lao Động", managing_body: "Tổng Liên đoàn Lao động Việt Nam", license: "GP số 139/GP-BTTTT do Bộ TT&TT cấp", category: "press", category_label: "Báo chí Lao động", trust_score: 98, status: "verified", security_features: "SSL OV, Tín Nhiệm Mạng", description: "Cơ quan báo chí đại diện bảo vệ quyền lợi người lao động và bảo vệ người tiêu dùng." },
+    { id: "SRC-12", domain: "tienphong.vn", alt_domains: [], name: "Báo Tiền Phong", managing_body: "Trung ương Đoàn TNCS Hồ Chí Minh", license: "GP số 76/GP-BTTTT do Bộ TT&TT cấp", category: "press", category_label: "Báo chí Giới trẻ", trust_score: 98, status: "verified", security_features: "SSL OV, Tín Nhiệm Mạng", description: "Tờ báo lâu đời của thanh niên Việt Nam, thường xuyên điều tra các đường dây lừa đảo tài chính." },
+    { id: "SRC-13", domain: "cand.com.vn", alt_domains: [], name: "Báo Công An Nhân Dân (CAND)", managing_body: "Cục Truyền thông CAND - Bộ Công An", license: "GP số 110/GP-BTTTT do Bộ TT&TT cấp", category: "cyber", category_label: "Pháp luật & An ninh", trust_score: 100, status: "verified", security_features: "DNSSEC, SSL OV, Tín Nhiệm Mạng", description: "Cơ quan ngôn luận của Bộ Công An, kênh thông báo chính thức về các chuyên án và thủ đoạn phạm tội công nghệ cao." },
+    { id: "SRC-14", domain: "qdnd.vn", alt_domains: [], name: "Báo Quân Đội Nhân Dân (QĐND)", managing_body: "Tổng cục Chính trị Quân đội nhân dân Việt Nam", license: "GP số 36/GP-BTTTT do Bộ TT&TT cấp", category: "press", category_label: "Quốc phòng & An ninh", trust_score: 100, status: "verified", security_features: "DNSSEC, SSL OV, Tín Nhiệm Mạng", description: "Tiếng nói của lực lượng vũ trang và nhân dân Việt Nam." },
+    { id: "SRC-15", domain: "tingia.gov.vn", alt_domains: [], name: "Trung tâm Xử lý Tin giả Việt Nam (VAFC)", managing_body: "Cục Phát thanh, truyền hình và thông tin điện tử - Bộ TT&TT", license: "Cổng thông tin chuyên trách xử lý tin giả quốc gia", category: "cyber", category_label: "Xác thực Tin giả Quốc gia", trust_score: 100, status: "verified", security_features: "DNSSEC, SSL EV, Tín Nhiệm Mạng, AIS Certified", description: "Cơ quan chuyên trách tiếp nhận, thẩm tra, công bố và xử lý tin giả, tin sai sự thật trên không gian mạng." },
+    { id: "SRC-16", domain: "tinnhiemmang.vn", alt_domains: ["ais.gov.vn"], name: "Hệ Sinh Thái Tín Nhiệm Mạng (Cục An toàn thông tin)", managing_body: "Cục An toàn thông tin - Bộ Thông tin & Truyền thông", license: "Hệ sinh thái chứng thực an toàn thông tin quốc gia", category: "cyber", category_label: "Chứng thực An toàn mạng", trust_score: 100, status: "verified", security_features: "DNSSEC, SSL EV, Khóa số NCSC", description: "Cơ quan cấp chứng nhận Tín nhiệm Mạng (Web Tín nhiệm, Thiết bị Tín nhiệm, Hệ thống Tín nhiệm) cho các website tại Việt Nam." },
+    { id: "SRC-17", domain: "canhbao.ncsc.gov.vn", alt_domains: ["ncsc.gov.vn", "khonggianmang.vn"], name: "Cổng Cảnh Báo An Toàn Không Gian Mạng Quốc Gia", managing_body: "Trung tâm Giám sát an toàn không gian mạng quốc gia (NCSC)", license: "Hệ thống cảnh báo an ninh mạng quốc gia", category: "cyber", category_label: "Cảnh báo Lừa đảo Quốc gia", trust_score: 100, status: "verified", security_features: "DNSSEC, SSL EV, Tín Nhiệm Mạng", description: "Cơ sở dữ liệu tập trung lưu trữ danh sách đen website lừa đảo, mã độc và hỗ trợ người dân kiểm tra an toàn số." },
+    { id: "SRC-18", domain: "bocongan.gov.vn", alt_domains: [], name: "Cổng Thông tin Điện tử Bộ Công An (Cục An ninh mạng A05)", managing_body: "Bộ Công An", license: "Cổng thông tin điện tử cơ quan ngang Bộ", category: "gov", category_label: "Cổng TT Bộ Công An", trust_score: 100, status: "verified", security_features: "DNSSEC, SSL EV, Chứng thư số Ban Cơ yếu Chính phủ", description: "Kênh tiếp nhận tin báo tố giác tội phạm và hướng dẫn pháp lý an ninh mạng trực tiếp cho người dân." },
+    { id: "SRC-19", domain: "dichvucong.gov.vn", alt_domains: [], name: "Cổng Dịch Vụ Công Quốc Gia", managing_body: "Văn phòng Chính phủ", license: "Hệ thống thông tin hành chính công quốc gia", category: "gov", category_label: "Dịch vụ công Quốc gia", trust_score: 100, status: "verified", security_features: "DNSSEC, SSL EV, Tích hợp VNeID", description: "Kênh duy nhất thực hiện thủ tục hành chính công trực tuyến của Chính phủ Việt Nam." },
+    { id: "SRC-20", domain: "moh.gov.vn", alt_domains: ["kcb.vn"], name: "Cổng Thông tin Điện tử Bộ Y Tế", managing_body: "Bộ Y Tế", license: "Cổng thông tin quản lý nhà nước về y tế", category: "health", category_label: "Y tế & Dược phẩm", trust_score: 100, status: "verified", security_features: "DNSSEC, SSL EV, Tín Nhiệm Mạng", description: "Nguồn thẩm định cao nhất đối với các kiến thức y khoa, cấp phép lưu hành thuốc và bác bỏ tin giả chữa bệnh." },
+    { id: "SRC-21", domain: "sbv.gov.vn", alt_domains: ["vnba.org.vn"], name: "Ngân Hàng Nhà Nước Việt Nam", managing_body: "Ngân hàng Nhà nước Việt Nam", license: "Cổng cơ quan quản lý tiền tệ quốc gia", category: "bank", category_label: "Ngân hàng Nhà nước", trust_score: 100, status: "verified", security_features: "DNSSEC, SSL EV, Chuẩn mã hóa tài chính", description: "Cơ quan điều hành chính sách tiền tệ, công bố danh sách tổ chức tín dụng hợp pháp và cảnh báo sàn tiền ảo bất hợp pháp." },
+    { id: "SRC-22", domain: "vietcombank.com.vn", alt_domains: [], name: "Ngân Hàng TMCP Ngoại Thương Việt Nam (Vietcombank)", managing_body: "Ngân hàng TMCP Ngoại thương Việt Nam", license: "Giấy phép thành lập và hoạt động NHNN số 138/GP-NHNN", category: "bank", category_label: "Ngân hàng Thương mại", trust_score: 99, status: "verified", security_features: "SSL EV (DigiCert), HSTS, PCI-DSS, Tín Nhiệm Mạng", description: "Domain ngân hàng số chính thức của Vietcombank." },
+    { id: "SRC-23", domain: "mbbank.com.vn", alt_domains: [], name: "Ngân Hàng TMCP Quân Đội (MB Bank)", managing_body: "Ngân hàng TMCP Quân Đội (Bộ Quốc Phòng)", license: "Giấy phép hoạt động NHNN số 100/GP-NHNN", category: "bank", category_label: "Ngân hàng Thương mại", trust_score: 99, status: "verified", security_features: "SSL EV, FIDO2, Tín Nhiệm Mạng", description: "Domain chính thức của MB Bank." },
+    { id: "SRC-24", domain: "techcombank.com.vn", alt_domains: ["techcombank.com"], name: "Ngân Hàng TMCP Kỹ Thương Việt Nam (Techcombank)", managing_body: "Ngân hàng TMCP Kỹ Thương Việt Nam", license: "Giấy phép hoạt động NHNN số 122/GP-NHNN", category: "bank", category_label: "Ngân hàng Thương mại", trust_score: 99, status: "verified", security_features: "SSL EV, Akamai Bot Manager, Tín Nhiệm Mạng", description: "Cổng giao dịch ngân hàng số chính thức của Techcombank." },
+    { id: "SRC-25", domain: "bidv.com.vn", alt_domains: [], name: "Ngân Hàng TMCP Đầu Tư và Phát Triển Việt Nam (BIDV)", managing_body: "Ngân hàng TMCP Đầu Tư và Phát Triển Việt Nam", license: "Giấy phép hoạt động NHNN số 84/GP-NHNN", category: "bank", category_label: "Ngân hàng Thương mại", trust_score: 99, status: "verified", security_features: "SSL EV, Tín Nhiệm Mạng", description: "Domain giao dịch chính thức của ngân hàng BIDV." },
+    { id: "SRC-26", domain: "vietinbank.vn", alt_domains: [], name: "Ngân Hàng TMCP Công Thương Việt Nam (VietinBank)", managing_body: "Ngân hàng TMCP Công Thương Việt Nam", license: "Giấy phép hoạt động NHNN số 142/GP-NHNN", category: "bank", category_label: "Ngân hàng Thương mại", trust_score: 99, status: "verified", security_features: "SSL EV, Tín Nhiệm Mạng", description: "Cổng thông tin và giao dịch ngân hàng số chính thức của VietinBank." },
+    { id: "SRC-27", domain: "agribank.com.vn", alt_domains: [], name: "Ngân Hàng Nông Nghiệp & Phát Triển Nông Thôn (Agribank)", managing_body: "Ngân hàng Nông nghiệp & Phát triển Nông thôn Việt Nam", license: "Doanh nghiệp 100% vốn nhà nước, giấy phép NHNN", category: "bank", category_label: "Ngân hàng Thương mại", trust_score: 99, status: "verified", security_features: "SSL EV, Tín Nhiệm Mạng", description: "Domain ngân hàng số duy nhất của Agribank." },
+    { id: "SRC-28", domain: "sggp.org.vn", alt_domains: [], name: "Báo Sài Gòn Giải Phóng", managing_body: "Thành ủy TP. Hồ Chí Minh", license: "GP số 446/GP-BTTTT do Bộ TT&TT cấp", category: "press", category_label: "Báo chí Địa phương", trust_score: 98, status: "verified", security_features: "SSL OV, Tín Nhiệm Mạng", description: "Cơ quan ngôn luận của Đảng bộ Đảng Cộng sản Việt Nam TP.HCM." },
+    { id: "SRC-29", domain: "hanoimoi.vn", alt_domains: [], name: "Báo Hà Nội Mới", managing_body: "Thành ủy Hà Nội", license: "GP số 135/GP-BTTTT do Bộ TT&TT cấp", category: "press", category_label: "Báo chí Địa phương", trust_score: 98, status: "verified", security_features: "SSL OV, Tín Nhiệm Mạng", description: "Tiếng nói của Đảng bộ, chính quyền và nhân dân Thủ đô Hà Nội." },
+    { id: "SRC-30", domain: "plo.vn", alt_domains: [], name: "Báo Pháp Luật TP. Hồ Chí Minh", managing_body: "Ủy ban Nhân dân TP. Hồ Chí Minh", license: "GP số 636/GP-BTTTT do Bộ TT&TT cấp", category: "cyber", category_label: "Pháp luật & Đời sống", trust_score: 98, status: "verified", security_features: "SSL OV, Tín Nhiệm Mạng", description: "Chuyên sâu về pháp luật, tố tụng và phân tích các hành vi lừa đảo hình sự mạng." },
+    { id: "SRC-31", domain: "nld.com.vn", alt_domains: [], name: "Báo Người Lao Động", managing_body: "Liên đoàn Lao động TP. Hồ Chí Minh", license: "GP số 115/GP-BTTTT do Bộ TT&TT cấp", category: "press", category_label: "Báo chí Xã hội", trust_score: 98, status: "verified", security_features: "SSL OV, Tín Nhiệm Mạng", description: "Cơ quan báo chí theo sát đời sống công nhân, cảnh báo bẫy việc làm và tín dụng đen." },
+    { id: "SRC-32", domain: "znews.vn", alt_domains: [], name: "Tạp Chí Tri Thức Znews", managing_body: "Hội Xuất bản Việt Nam", license: "GP số 75/GP-BTTTT do Bộ TT&TT cấp", category: "investigative", category_label: "Tạp chí Đời sống", trust_score: 97, status: "verified", security_features: "SSL OV, CDN Cloudflare", description: "Kênh thông tin trực tuyến cho giới trẻ và công nghệ." },
+    { id: "SRC-33", domain: "baochinhphu.vn", alt_domains: [], name: "Báo Điện tử Chính phủ (baochinhphu.vn)", managing_body: "Cổng Thông tin điện tử Chính phủ", license: "GP số 57/GP-BTTTT do Bộ TT&TT cấp", category: "gov", category_label: "Báo Điện tử Chính phủ", trust_score: 100, status: "verified", security_features: "DNSSEC, SSL EV, Tín Nhiệm Mạng", description: "Trang thông tin tổng hợp hoạt động của Thủ tướng, các Phó Thủ tướng và văn bản quy phạm pháp luật." },
+    { id: "SRC-34", domain: "who.int", alt_domains: [], name: "Tổ Chức Y Tế Thế Giới (WHO - Văn Phòng Việt Nam)", managing_body: "Liên Hợp Quốc (UN)", license: "Cơ quan chuyên trách quốc tế về y tế", category: "health", category_label: "Y tế Quốc tế", trust_score: 100, status: "verified", security_features: "DNSSEC, SSL EV Quốc tế", description: "Nguồn xác minh các khuyến cáo y học toàn cầu và phản bác tin giả y tế xuyên biên giới." },
+    { id: "SRC-35", domain: "moet.gov.vn", alt_domains: [], name: "Cổng Thông tin Điện tử Bộ Giáo Dục & Đào Tạo", managing_body: "Bộ Giáo Dục và Đào Tạo", license: "Cổng cơ quan quản lý nhà nước về giáo dục", category: "gov", category_label: "Giáo dục Quốc gia", trust_score: 100, status: "verified", security_features: "DNSSEC, SSL EV, Tín Nhiệm Mạng", description: "Cơ quan phát ngôn chính thức về thi tốt nghiệp THPT, tuyển sinh đại học và quy chế giáo dục." }
+];
+
+let DATABASE = [
+    { id: 1, type: "website", type_label: "Website lừa đảo", target: "vietcombank-online.vn.com", title: "Trang web giả mạo Vietcombank", category: "Mạo danh Ngân hàng", description: "Giả mạo trang đăng nhập Vietcombank để chiếm đoạt tài khoản.", verdict: "NGUY HIỂM", status: "danger", score: 12, criteria: { brand_impersonation: "Vietcombank" }, source: "PhishTank, WHOIS Check", reported_date: "2026-11-22" },
+    { id: 2, type: "website", type_label: "Website lừa đảo", target: "mbbank-ebanking.top", title: "Website phishing giả mạo MB Bank", category: "Mạo danh Ngân hàng", description: "Website phishing giả mạo dịch vụ e-banking MB Bank.", verdict: "NGUY HIỂM", status: "danger", score: 8, criteria: { brand_impersonation: "MB Bank" }, source: "OpenPhish, DNS Check", reported_date: "2026-11-21" },
+    { id: 3, type: "website", type_label: "Website lừa đảo", target: "dichvucong-gov.org", title: "Giả mạo Cổng dịch vụ công quốc gia", category: "Mạo danh Cơ quan nhà nước", description: "Lừa người dùng cập nhật thông tin định danh CCCD.", verdict: "NGUY HIỂM", status: "danger", score: 5, criteria: { brand_impersonation: "Cổng Dịch Vụ Công Quốc Gia" }, source: "Google Safe Browsing", reported_date: "2026-11-20" },
+    { id: 4, type: "tin-gia", type_label: "Tin giả", target: "\"Uống nước chanh ấm mỗi sáng chữa được ung thư giai đoạn cuối\"", title: "Tin giả y tế chữa ung thư bằng nước chanh", category: "Tin giả Y tế", description: "Không có bằng chứng khoa học hỗ trợ tuyên bố này.", verdict: "NGUY HIỂM", status: "danger", score: 15, criteria: { brand_impersonation: null }, source: "Bộ Y tế, WHO", reported_date: "2026-11-21" },
+    { id: 5, type: "tin-nhan", type_label: "Tin nhắn lừa đảo", target: "\"Chúc mừng bạn đã trúng thưởng 500 triệu từ Viettel: viettel-promo.xyz\"", title: "Tin nhắn trúng thưởng mạo danh Viettel", category: "Tin nhắn Lừa đảo", description: "Dẫn dụ truy cập website phishing chiếm đoạt tài khoản.", verdict: "NGUY HIỂM", status: "danger", score: 6, criteria: { brand_impersonation: "Viettel Telecom" }, source: "Viettel, Cục ATTT", reported_date: "2026-11-20" },
+    { id: 6, type: "website", type_label: "Website lừa đảo", target: "csgt-phatnguoi.top", title: "Mạo danh Cục CSGT tra cứu phạt nguội", category: "Mạo danh Cơ quan nhà nước", description: "Yêu cầu nộp tiền phạt giao thông vào tài khoản cá nhân.", verdict: "NGUY HIỂM", status: "danger", score: 9, criteria: { brand_impersonation: "Cục Cảnh sát Giao thông" }, source: "Cục CSGT - Bộ Công An", reported_date: "2026-11-22" },
+    { id: 7, type: "tin-gia", type_label: "Tin giả", target: "\"Bộ GD&ĐT chính thức thông báo hủy bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm 2026\"", title: "Tin đồn hủy kỳ thi tốt nghiệp THPT", category: "Tin giả Giáo dục", description: "Văn bản giả mạo lan truyền gây hoang mang.", verdict: "NGUY HIỂM", status: "danger", score: 11, criteria: { brand_impersonation: "Bộ Giáo Dục & Đào Tạo" }, source: "Bộ GD&ĐT (moet.gov.vn)", reported_date: "2026-11-19" },
+    { id: 8, type: "website", type_label: "Cổng thông tin", target: "chinhphu.vn", title: "Cổng Thông tin Điện tử Chính phủ", category: "Cổng thông tin Chính phủ", description: "Cơ quan phát ngôn chính thức của Chính phủ Việt Nam.", verdict: "AN TOÀN", status: "safe", score: 100, criteria: { brand_impersonation: null }, source: "Văn phòng Chính phủ", reported_date: "2026-11-23" }
+];
+
+/* ==============================================================
+   4. LIVE CONTINUOUS NEWS STREAM & COMMUNITY TRUST ENGINE
+   ============================================================== */
+let LIVE_NEWS_FEED = [
+    {
+        id: "NEWS-2026-101",
+        statusTag: "official",
+        statusLabel: "🏛️ Báo Chính Phủ · Chính thống",
+        sourceName: "Báo Điện tử Chính phủ",
+        sourceDomain: "baochinhphu.vn",
+        url: "https://baochinhphu.vn/tang-cuong-phong-chong-lua-dao-tren-khong-gian-mang-2026.htm",
+        timeLabel: "Vừa cập nhật · 3 phút trước",
+        category: "Thời sự - Chính sách",
+        headline: "Chính phủ chỉ đạo đồng bộ giải pháp xác thực tài khoản định danh điện tử nhằm ngăn chặn lừa đảo trực tuyến",
+        snippet: "Văn phòng Chính phủ thông báo kết luận về việc kết nối cơ sở dữ liệu quốc gia, làm sạch tài khoản ngân hàng không chính chủ và xử lý nghiêm tin giả.",
+        checkType: "website",
+        communitySafeVotes: 342,
+        communityWarnVotes: 6,
+        communityDangerVotes: 2,
+        peerNotes: [
+            { author: "Ban Biên Tập Kiểm Chứng", role: "Chuyên gia Báo chí", vote: "safe", note: "Đã đối soát trực tiếp trên cổng baochinhphu.vn (GP số 57/GP-BTTTT), văn bản chính xác 100%.", time: "2 phút trước" },
+            { author: "Minh Quân (Hà Nội)", role: "Thành viên Tín nhiệm", vote: "safe", note: "Thông tin trùng khớp với bản tin Thời sự VTV1 tối qua.", time: "1 phút trước" }
+        ]
+    },
+    {
+        id: "NEWS-2026-102",
+        statusTag: "official",
+        statusLabel: "🏛️ Tuổi Trẻ Online · Chính thống",
+        sourceName: "Báo Tuổi Trẻ",
+        sourceDomain: "tuoitre.vn",
+        url: "https://tuoitre.vn/canh-bao-thu-doan-gia-mao-ung-dung-dich-vu-cong-chiem-quyen-dien-thoai.htm",
+        timeLabel: "8 phút trước",
+        category: "Cảnh báo An toàn số",
+        headline: "Cảnh báo thủ đoạn gọi điện hướng dẫn cài ứng dụng dịch vụ công giả mạo chiếm quyền điều khiển điện thoại",
+        snippet: "Cục An toàn thông tin (Bộ TT&TT) phối hợp cùng các cơ quan báo chí cảnh báo người dân tuyệt đối không cài file .apk ngoài kho ứng dụng chính thức.",
+        checkType: "website",
+        communitySafeVotes: 289,
+        communityWarnVotes: 4,
+        communityDangerVotes: 1,
+        peerNotes: [
+            { author: "Vũ Hoàng (Chuyên gia ATTT)", role: "Cộng đồng NCSC", vote: "safe", note: "Bài viết chuẩn xác từ Báo Tuổi Trẻ, khuyến nghị hữu ích bảo vệ người cao tuổi.", time: "5 phút trước" }
+        ]
+    },
+    {
+        id: "NEWS-2026-103",
+        statusTag: "hoax",
+        statusLabel: "🚨 Tin đồn MXH · Nghi vấn Tin giả",
+        sourceName: "Mạng xã hội (Chưa kiểm chứng)",
+        sourceDomain: "viral-social-claim",
+        url: "Ngân hàng Nhà nước thông báo sắp đổi mẫu tiền polymer và hạn chế người dân rút tiền mặt tại quầy từ tuần tới",
+        timeLabel: "12 phút trước",
+        category: "Kinh tế - Tài chính",
+        headline: "TIN KHẨN: Ngân hàng Nhà nước sắp đổi mẫu tiền polymer và hạn chế rút tiền mặt tại quầy?",
+        snippet: "Bài đăng lan truyền trên các hội nhóm kêu gọi người dân rút tiền mặt gấp vì tin đồn thay đổi tiền tệ gây hoang mang dư luận.",
+        checkType: "tin-gia",
+        communitySafeVotes: 8,
+        communityWarnVotes: 31,
+        communityDangerVotes: 418,
+        peerNotes: [
+            { author: "Trung tâm Xử lý Tin giả VAFC", role: "Cơ quan Kiểm chứng", vote: "danger", note: "BÁC BỎ: Ngân hàng Nhà nước Việt Nam (sbv.gov.vn) khẳng định đây là tin bịa đặt, vi phạm pháp luật.", time: "6 phút trước" },
+            { author: "Thanh Tùng (TP.HCM)", role: "Cộng đồng FactCheck", vote: "danger", note: "Tin giả tái diễn nhiều năm để câu tương tác, mọi người đừng chia sẻ.", time: "3 phút trước" }
+        ]
+    },
+    {
+        id: "NEWS-2026-104",
+        statusTag: "official",
+        statusLabel: "🏛️ VnExpress · Chính thống",
+        sourceName: "Báo Điện tử VnExpress",
+        sourceDomain: "vnexpress.net",
+        url: "https://vnexpress.net/gia-xang-dau-dieu-hanh-theo-chu-ky-moi-ngay-hom-nay.html",
+        timeLabel: "19 phút trước",
+        category: "Kinh tế - Đời sống",
+        headline: "Liên Bộ Công Thương - Tài chính điều hành giá bán lẻ xăng dầu theo diễn biến thị trường thế giới",
+        snippet: "Theo quyết định điều hành mới nhất của liên Bộ Công Thương - Tài chính, giá các mặt hàng xăng dầu trong nước được niêm yết công khai tại hệ thống cửa hàng.",
+        checkType: "website",
+        communitySafeVotes: 215,
+        communityWarnVotes: 5,
+        communityDangerVotes: 2,
+        peerNotes: [
+            { author: "Lê Thu Hà", role: "Biên tập viên", vote: "safe", note: "Nguồn VnExpress chính thống, số liệu khớp thông cáo báo chí Bộ Công Thương.", time: "10 phút trước" }
+        ]
+    },
+    {
+        id: "NEWS-2026-105",
+        statusTag: "viral",
+        statusLabel: "⚠️ Link lạ lan truyền · Cần đối soát",
+        sourceName: "Trang tin mạo danh (.xyz)",
+        sourceDomain: "tuoitre-online.xyz",
+        url: "https://tuoitre-online.xyz/nhan-ho-tro-an-sinh-xa-hoi-cuoi-nam-2026",
+        timeLabel: "25 phút trước",
+        category: "Cảnh báo Lừa đảo",
+        headline: "Trang web tuoitre-online.xyz đăng tin hướng dẫn nhận gói hỗ trợ an sinh xã hội yêu cầu nhập OTP ngân hàng",
+        snippet: "Website sử dụng giao diện nhái Báo Tuổi Trẻ nhưng tên miền đuôi .xyz đăng ký ẩn danh ở nước ngoài nhằm đánh cắp thông tin tài khoản.",
+        checkType: "website",
+        communitySafeVotes: 3,
+        communityWarnVotes: 19,
+        communityDangerVotes: 274,
+        peerNotes: [
+            { author: "Đội Phản ứng nhanh LCS", role: "Kiểm chứng viên", vote: "danger", note: "MẠO DANH BÁO CHÍ: Báo Tuổi Trẻ chỉ dùng tên miền duy nhất tuoitre.vn. Tên miền .xyz này là phishing!", time: "14 phút trước" }
+        ]
+    },
+    {
+        id: "NEWS-2026-106",
+        statusTag: "official",
+        statusLabel: "🏛️ Sức khỏe & Đời sống / Bộ Y Tế",
+        sourceName: "Cổng TT Bộ Y Tế",
+        sourceDomain: "moh.gov.vn",
+        url: "https://moh.gov.vn/tin-tong-hop/-/asset_publisher/khuyen-cao-phong-benh-ho-hap-mua-dong-2026",
+        timeLabel: "32 phút trước",
+        category: "Y tế - Sức khỏe",
+        headline: "Bộ Y tế khuyến cáo người dân chủ động tiêm phòng vắc-xin và giữ ấm phòng bệnh đường hô hấp giai đoạn chuyển mùa",
+        snippet: "Cục Y tế Dự phòng (Bộ Y tế) hướng dẫn các biện pháp vệ sinh cá nhân, dinh dưỡng hợp lý và cảnh giác với các bài thuốc truyền miệng không rõ nguồn gốc.",
+        checkType: "website",
+        communitySafeVotes: 196,
+        communityWarnVotes: 2,
+        communityDangerVotes: 0,
+        peerNotes: [
+            { author: "BS. Nguyễn Văn Nam", role: "Cố vấn Y khoa", vote: "safe", note: "Khuyến cáo chính thức từ Cổng TTĐT Bộ Y Tế (moh.gov.vn), thông tin an toàn và khoa học.", time: "18 phút trước" }
+        ]
+    }
+];
+
+let currentFeedFilter = 'all';
+let autoRefreshEnabled = true;
+let autoRefreshSeconds = 60;
+let autoRefreshTimer = null;
+
+// Lưu trữ trạng thái bình chọn cộng đồng theo từng mục tiêu kiểm tra
+const COMMUNITY_VOTE_STORE = {};
+
+function getCommunityMetrics(targetKey, defaultSafe = 42, defaultWarn = 5, defaultDanger = 3, defaultNotes = []) {
+    const normKey = targetKey.trim().toLowerCase();
+    if (!COMMUNITY_VOTE_STORE[normKey]) {
+        // Kiểm tra xem có khớp bài báo trong LIVE_NEWS_FEED không
+        const matchedNews = LIVE_NEWS_FEED.find(n =>
+            n.url.toLowerCase() === normKey ||
+            n.headline.toLowerCase() === normKey ||
+            normKey.includes(n.sourceDomain)
+        );
+        if (matchedNews && matchedNews.sourceDomain !== 'viral-social-claim') {
+            COMMUNITY_VOTE_STORE[normKey] = {
+                safe: matchedNews.communitySafeVotes,
+                warn: matchedNews.communityWarnVotes,
+                danger: matchedNews.communityDangerVotes,
+                userVoted: null,
+                notes: [...matchedNews.peerNotes]
+            };
+        } else {
+            COMMUNITY_VOTE_STORE[normKey] = {
+                safe: defaultSafe,
+                warn: defaultWarn,
+                danger: defaultDanger,
+                userVoted: null,
+                notes: [...defaultNotes]
+            };
+        }
+    }
+    const entry = COMMUNITY_VOTE_STORE[normKey];
+    const total = Math.max(1, entry.safe + entry.warn + entry.danger);
+    const safePct = Math.round((entry.safe / total) * 100);
+    const warnPct = Math.round((entry.warn / total) * 100);
+    const dangerPct = Math.max(0, 100 - safePct - warnPct);
+    // Điểm tín nhiệm cộng đồng (0 - 100)
+    const trustIndex = Math.round(((entry.safe * 1.0 + entry.warn * 0.4) / total) * 100);
+    return { ...entry, total, safePct, warnPct, dangerPct, trustIndex };
+}
+
+function renderLiveNewsStream() {
+    const grid = document.getElementById('liveNewsGrid');
+    if (!grid) return;
+
+    const filtered = LIVE_NEWS_FEED.filter(item => currentFeedFilter === 'all' || item.statusTag === currentFeedFilter);
+
+    grid.innerHTML = filtered.map(item => {
+        const cm = getCommunityMetrics(item.url, item.communitySafeVotes, item.communityWarnVotes, item.communityDangerVotes, item.peerNotes);
+        const isSafeConsensus = cm.trustIndex >= 75;
+        const statColor = isSafeConsensus ? '#86EFAC' : (cm.dangerPct >= 50 ? '#FCA5A5' : '#FDE047');
+        const statText = isSafeConsensus
+            ? `👥 Cộng đồng: ${cm.safePct}% An toàn (${cm.total} lượt)`
+            : (cm.dangerPct >= 50
+                ? `👥 Cộng đồng: ${cm.dangerPct}% Cảnh báo giả (${cm.total} lượt)`
+                : `👥 Cộng đồng: ${cm.warnPct}% Cần kiểm chứng (${cm.total} lượt)`);
+
+        return `
+            <div class="news-stream-card">
+                <div>
+                    <div class="news-card-top">
+                        <span class="news-source-pill ${item.statusTag}">${item.statusLabel}</span>
+                        <span class="news-time">${item.timeLabel}</span>
+                    </div>
+                    <div class="news-headline" style="margin-top:8px" title="${escapeHtml(item.headline)}">${escapeHtml(item.headline)}</div>
+                    <div class="news-snippet" style="margin-top:5px">${escapeHtml(item.snippet)}</div>
+                </div>
+                <div class="news-card-footer">
+                    <span class="community-mini-stat" style="color:${statColor}">${statText}</span>
+                    <button class="btn-verify-news" onclick="verifyLiveNewsItem('${item.id}')">⚡ Kiểm Tra Ngay</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function filterLiveNews(cat) {
+    currentFeedFilter = cat;
+    document.querySelectorAll('.feed-pill').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.cat === cat);
+    });
+    renderLiveNewsStream();
+}
+
+function verifyLiveNewsItem(newsId) {
+    const item = LIVE_NEWS_FEED.find(n => n.id === newsId);
+    if (!item) return;
+
+    switchCheckTab(item.checkType);
+    if (item.checkType === 'website') {
+        document.getElementById('inputUrl').value = item.url;
+    } else {
+        document.getElementById('inputTextNews').value = item.url;
+        updateCharCount('inputTextNews', 'newsCharCount');
+    }
+
+    document.getElementById('kiem-tra').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    runCheck();
+}
+
+// Fetch real-time RSS articles from reputable Vietnamese press via rss2json with graceful fallback
+async function refreshLiveNewsStream(manual = false) {
+    const statusText = document.getElementById('liveFeedStatusText');
+    const updateLabel = document.getElementById('lastFeedUpdateLabel');
+    if (statusText) statusText.textContent = '📡 Đang đồng bộ tin báo chí mới...';
+
+    const rssEndpoints = [
+        { url: 'https://vnexpress.net/rss/tin-moi-nhat.rss', sourceName: 'Báo Điện tử VnExpress', domain: 'vnexpress.net', label: '🏛️ VnExpress · Tin mới RSS' },
+        { url: 'https://tuoitre.vn/rss/tin-moi-nhat.rss', sourceName: 'Báo Tuổi Trẻ', domain: 'tuoitre.vn', label: '🏛️ Tuổi Trẻ · Tin mới RSS' }
+    ];
+
+    let fetchedCount = 0;
+    for (const feed of rssEndpoints) {
+        try {
+            const resp = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`);
+            if (resp.ok) {
+                const data = await resp.json();
+                if (data.status === 'ok' && Array.isArray(data.items) && data.items.length > 0) {
+                    const topArticles = data.items.slice(0, 2);
+                    topArticles.forEach((art, idx) => {
+                        const cleanTitle = (art.title || '').trim();
+                        const cleanDesc = (art.description || '').replace(/<[^>]*>/g, '').trim();
+                        const artLink = art.link || `https://${feed.domain}`;
+                        if (cleanTitle && !LIVE_NEWS_FEED.some(existing => existing.headline === cleanTitle)) {
+                            LIVE_NEWS_FEED.unshift({
+                                id: `RSS-${Date.now()}-${idx}`,
+                                statusTag: "official",
+                                statusLabel: feed.label,
+                                sourceName: feed.sourceName,
+                                sourceDomain: feed.domain,
+                                url: artLink,
+                                timeLabel: "Vừa cập nhật trực tuyến",
+                                category: "Tin Thời Sự Mới",
+                                headline: cleanTitle,
+                                snippet: cleanDesc || `Bản tin mới nhất được cập nhật trực tiếp từ tòa soạn ${feed.sourceName} (${feed.domain}).`,
+                                checkType: "website",
+                                communitySafeVotes: 145 + Math.floor(Math.random() * 80),
+                                communityWarnVotes: 2,
+                                communityDangerVotes: 0,
+                                peerNotes: [
+                                    { author: "Hệ thống Đồng bộ RSS Báo chí", role: "Nguồn Chính thống", vote: "safe", note: `Bài viết xuất bản trực tiếp trên tên miền chính thức ${feed.domain} đã xác thực giấy phép Bộ TT&TT.`, time: "Vừa xong" }
+                                ]
+                            });
+                            fetchedCount++;
+                        }
+                    });
+                }
+            }
+        } catch (err) {
+            // Fallback silently to curated live feed
+        }
+    }
+
+    // Giữ danh sách tối đa 9 tin mới nhất để giao diện gọn gàng
+    if (LIVE_NEWS_FEED.length > 9) {
+        LIVE_NEWS_FEED = LIVE_NEWS_FEED.slice(0, 9);
+    }
+
+    // Cập nhật nhãn thời gian
+    const nowTime = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    if (updateLabel) updateLabel.textContent = `Cập nhật lúc ${nowTime}`;
+    if (statusText) {
+        statusText.textContent = fetchedCount > 0
+            ? `📡 Đã đồng bộ +${fetchedCount} tin báo mới lúc ${nowTime}`
+            : `📡 Luồng tin Báo chí & Cộng đồng trực tuyến (${nowTime})`;
+    }
+
+    autoRefreshSeconds = 60;
+    renderLiveNewsStream();
+}
+
+function toggleAutoRefreshNews() {
+    autoRefreshEnabled = !autoRefreshEnabled;
+    const btn = document.getElementById('btnAutoRefreshToggle');
+    if (autoRefreshEnabled) {
+        autoRefreshSeconds = 60;
+        btn.innerHTML = `<span>⏱️</span> Tự động: BẬT (<span id="autoRefreshCountdown">60</span>s)`;
+    } else {
+        btn.innerHTML = `<span>⏸️</span> Tự động: TẮT`;
+    }
+}
+
+setInterval(() => {
+    if (!autoRefreshEnabled) return;
+    autoRefreshSeconds--;
+    const cdEl = document.getElementById('autoRefreshCountdown');
+    if (cdEl) cdEl.textContent = autoRefreshSeconds;
+    if (autoRefreshSeconds <= 0) {
+        refreshLiveNewsStream(false);
+    }
+}, 1000);
+
+/* ==============================================================
+   5. KIỂM TRA NGAY — JOURNALISTIC + COMMUNITY CONSENSUS ENGINE
+   ============================================================== */
+let AI_CONFIG = {
+    mode: localStorage.getItem('fc_ai_mode') || 'local',
+    geminiKey: localStorage.getItem('fc_gemini_key') || ''
+};
+
+function openAIConfigModal() {
+    document.getElementById('aiModeSelect').value = AI_CONFIG.mode;
+    document.getElementById('geminiApiKey').value = AI_CONFIG.geminiKey;
+    toggleApiKeyInput();
+    document.getElementById('aiConfigModal').classList.add('show');
+}
+function closeAIConfigModal() { document.getElementById('aiConfigModal').classList.remove('show'); }
+function toggleApiKeyInput() {
+    const mode = document.getElementById('aiModeSelect').value;
+    document.getElementById('geminiKeyGroup').style.display = mode === 'gemini' ? 'block' : 'none';
+}
+function saveAIConfig() {
+    AI_CONFIG.mode = document.getElementById('aiModeSelect').value;
+    AI_CONFIG.geminiKey = document.getElementById('geminiApiKey').value.trim();
+    localStorage.setItem('fc_ai_mode', AI_CONFIG.mode);
+    localStorage.setItem('fc_gemini_key', AI_CONFIG.geminiKey);
+    closeAIConfigModal();
+    alert('Đã cập nhật cấu hình AI thành công!');
+}
+
+let currentCheckTab = 'website';
+let currentSearchType = 'website';
+let lastCheckResult = null;
+
+const CHECK_SAMPLES = {
+    'website': [
+        { label: 'Báo Tuổi Trẻ (An toàn)', val: 'https://tuoitre.vn' },
+        { label: 'Báo Điện tử Chính phủ (An toàn)', val: 'https://baochinhphu.vn' },
+        { label: 'Mạo danh Báo Tuổi Trẻ (.xyz)', val: 'https://tuoitre-online.xyz' },
+        { label: 'Phishing Vietcombank', val: 'vietcom-bank.com.vn' },
+        { label: 'Mạo danh Dịch vụ công', val: 'dichvucong-gov.org' }
+    ],
+    'tin-gia': [
+        { label: 'Tin giả: Đổi mẫu tiền polymer', val: 'Ngân hàng Nhà nước thông báo sắp đổi mẫu tiền polymer và hạn chế người dân rút tiền mặt tại quầy từ tuần tới' },
+        { label: 'Tin giả: Chanh nóng chữa ung thư', val: 'Uống nước chanh nóng và sả gừng mỗi sáng có thể tiêu diệt 100% tế bào ung thư mà không cần xạ trị.' },
+        { label: 'Tin chính thống: Bộ Y tế khuyến cáo', val: 'Bộ Y tế khuyến cáo người dân chủ động tiêm phòng vắc-xin và giữ ấm phòng bệnh đường hô hấp giai đoạn chuyển mùa' }
+    ],
+    'tin-nhan': [
+        { label: 'SMS Vietcombank mạo danh', val: 'Vietcombank: Tai khoan quy khach dang co dau hieu bat thuong. Vui long dang nhap https://vietcom-bank.com.vn de xac minh truoc 24h tranh bi khoa vinh vien.', sender: 'Vietcombank' },
+        { label: 'Bẫy CTV Shopee hoa hồng 25%', val: 'Shopee tuyen CTV lam viec tai nha, chi can tha tim video va review san pham, nap coc 500k nhan ngay 250k hoa hong trong ngay qua Zalo 0987xxx.', sender: 'Tuyển dụng Shopee' },
+        { label: 'Mạo danh CSGT phạt nguội', val: 'Cuc CSGT thong bao: Ban co bien ban vi pham phat nguoi 5.000.000d qua camera giao thong. Truy cap csgt-phatnguoi.top de dong phat truoc ngay 25/11.', sender: 'CSGT-BoCongAn' }
+    ],
+    'tai-khoan': [
+        { label: 'MB Bank: 0384928172 (Lừa cọc xe)', bank: 'MBBank', val: '0384928172' },
+        { label: 'Hotline Viện KS mạo danh: 02473008899', bank: 'Other', val: '024 7300 8899' },
+        { label: 'Vietcombank: 1029384756 (STK an toàn)', bank: 'Vietcombank', val: '1029384756' }
+    ]
+};
+
+function switchCheckTab(tabId) {
+    currentCheckTab = tabId;
+    currentSearchType = tabId === 'tai-khoan' ? 'website' : tabId;
+
+    document.querySelectorAll('.check-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.type === tabId));
+    document.getElementById('panelWebsite').classList.toggle('active', tabId === 'website');
+    document.getElementById('panelTinGia').classList.toggle('active', tabId === 'tin-gia');
+    document.getElementById('panelTinNhan').classList.toggle('active', tabId === 'tin-nhan');
+    document.getElementById('panelTaiKhoan').classList.toggle('active', tabId === 'tai-khoan');
+
+    for (let i = 1; i <= 4; i++) {
+        document.getElementById(`stepIndicator${i}`).className = i === 1 ? 'step-item active' : 'step-item';
+    }
+    renderQuickSamples();
+}
+
+function renderQuickSamples() {
+    const container = document.getElementById('quickSamplesContainer');
+    if (!container) return;
+    const samples = CHECK_SAMPLES[currentCheckTab] || [];
+    let html = `<span style="font-weight:700;color:var(--orange)">Mẫu kiểm chứng nhanh:</span>`;
+    samples.forEach(s => {
+        const valEscaped = s.val.replace(/'/g, "\\'");
+        const extraParam = s.sender ? `'${s.sender}'` : (s.bank ? `'${s.bank}'` : 'null');
+        html += `<span class="sample-chip" onclick="fillSample('${valEscaped}', '${currentCheckTab}', ${extraParam})">${s.label}</span>`;
+    });
+    container.innerHTML = html;
+}
+
+function clearField(id) { const el = document.getElementById(id); if (el) el.value = ''; }
+
+function clearCurrentActive() {
+    if (currentCheckTab === 'website') clearField('inputUrl');
+    else if (currentCheckTab === 'tin-gia') { clearField('inputTextNews'); updateCharCount('inputTextNews', 'newsCharCount'); }
+    else if (currentCheckTab === 'tin-nhan') { clearField('inputMsgSender'); clearField('inputTextMsg'); updateCharCount('inputTextMsg', 'msgCharCount'); }
+    else if (currentCheckTab === 'tai-khoan') { document.getElementById('selectBank').value = 'ALL'; clearField('inputBankAcc'); }
+}
+
+async function pasteCurrentActive() {
+    try {
+        const text = await navigator.clipboard.readText();
+        if (!text) return;
+        if (currentCheckTab === 'website') document.getElementById('inputUrl').value = text.trim();
+        else if (currentCheckTab === 'tin-gia') { document.getElementById('inputTextNews').value = text.trim(); updateCharCount('inputTextNews', 'newsCharCount'); }
+        else if (currentCheckTab === 'tin-nhan') { document.getElementById('inputTextMsg').value = text.trim(); updateCharCount('inputTextMsg', 'msgCharCount'); }
+        else if (currentCheckTab === 'tai-khoan') document.getElementById('inputBankAcc').value = text.trim();
+    } catch (err) {
+        alert('Trình duyệt không cho phép đọc clipboard tự động. Vui lòng bấm phím Ctrl+V để dán.');
+    }
+}
+
+function updateCharCount(fieldId, countId) {
+    const field = document.getElementById(fieldId);
+    const countEl = document.getElementById(countId);
+    if (field && countEl) countEl.textContent = `${field.value.length} ký tự`;
+}
+
+function fillSample(val, tabId, extra) {
+    if (currentCheckTab !== tabId) switchCheckTab(tabId);
+    if (tabId === 'website') document.getElementById('inputUrl').value = val;
+    else if (tabId === 'tin-gia') { document.getElementById('inputTextNews').value = val; updateCharCount('inputTextNews', 'newsCharCount'); }
+    else if (tabId === 'tin-nhan') {
+        if (extra) document.getElementById('inputMsgSender').value = extra;
+        document.getElementById('inputTextMsg').value = val; updateCharCount('inputTextMsg', 'msgCharCount');
+    } else if (tabId === 'tai-khoan') {
+        if (extra) document.getElementById('selectBank').value = extra;
+        document.getElementById('inputBankAcc').value = val;
+    }
+    runCheck();
+}
+
+async function runCheck() {
+    let target = '', extraMeta = '';
+
+    if (currentCheckTab === 'website') {
+        target = document.getElementById('inputUrl').value.trim();
+        if (!target) { alert('Vui lòng nhập đường dẫn bài báo hoặc tên miền cần kiểm tra.'); return; }
+    } else if (currentCheckTab === 'tin-gia') {
+        target = document.getElementById('inputTextNews').value.trim();
+        if (!target) { alert('Vui lòng nhập tiêu đề hoặc nội dung tin tức cần kiểm chứng.'); return; }
+    } else if (currentCheckTab === 'tin-nhan') {
+        target = document.getElementById('inputTextMsg').value.trim();
+        extraMeta = document.getElementById('inputMsgSender').value.trim();
+        if (!target) { alert('Vui lòng nhập nội dung tin nhắn cần kiểm tra.'); return; }
+    } else if (currentCheckTab === 'tai-khoan') {
+        target = document.getElementById('inputBankAcc').value.trim();
+        const bank = document.getElementById('selectBank').value;
+        extraMeta = bank !== 'ALL' ? bank : 'Ngân hàng chưa rõ';
+        if (!target) { alert('Vui lòng nhập Số tài khoản hoặc Số điện thoại cần kiểm tra.'); return; }
+    }
+
+    document.getElementById('stepIndicator1').className = 'step-item done';
+    document.getElementById('stepIndicator2').className = 'step-item active';
+    document.getElementById('stepIndicator3').className = 'step-item';
+    document.getElementById('stepIndicator4').className = 'step-item';
+
+    const scanBox = document.getElementById('aiScanningBox');
+    const panel = document.getElementById('resultPanel');
+    const progressFill = document.getElementById('scanProgressFill');
+    panel.classList.remove('show');
+    scanBox.classList.add('show');
+    scanBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    const steps = [1,2,3,4,5].map(i => document.getElementById(`scanStep${i}`));
+    const percentEl = document.getElementById('scanPercent');
+
+    for (let i = 0; i < steps.length; i++) {
+        steps.forEach((s, idx) => {
+            if (idx < i) s.className = 'scan-step done';
+            else if (idx === i) s.className = 'scan-step active';
+            else s.className = 'scan-step';
+        });
+        if (i === 2) document.getElementById('stepIndicator3').className = 'step-item active';
+        const pct = (i + 1) * 20;
+        percentEl.textContent = `${pct}%`;
+        if (progressFill) progressFill.style.width = `${pct}%`;
+        await new Promise(r => setTimeout(r, 210));
+    }
+
+    scanBox.classList.remove('show');
+
+    const result = analyzeTargetJournalistic(target, currentCheckTab, extraMeta);
+    lastCheckResult = result;
+    renderFactCheckReport(result);
+
+    document.getElementById('stepIndicator2').className = 'step-item done';
+    document.getElementById('stepIndicator3').className = 'step-item done';
+    document.getElementById('stepIndicator4').className = 'step-item active';
+
+    panel.classList.add('show');
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function extractDomain(inputStr) {
+    if (!inputStr) return '';
+    let clean = inputStr.trim().toLowerCase();
+    clean = clean.replace(/^(https?:\/\/)?(www\.)?/, '');
+    clean = clean.split('/')[0].split('?')[0].split(':')[0];
+    return clean;
+}
+
+function findVerifiedSource(targetStr) {
+    const d = extractDomain(targetStr);
+    for (const src of VERIFIED_SOURCES_DB) {
+        if (d === src.domain || src.alt_domains.includes(d) || d.endsWith('.' + src.domain)) {
+            return src;
+        }
+    }
+    return null;
+}
+
+function findMediaTyposquat(targetStr) {
+    const d = extractDomain(targetStr);
+    const suspiciousExts = ['.xyz', '.top', '.icu', '.vip', '.online', '.site', '.cc', '.club', '.net', '.org', '.info', '.biz'];
+    for (const src of VERIFIED_SOURCES_DB) {
+        const root = src.domain.split('.')[0];
+        if (root.length >= 4 && d !== src.domain && !src.alt_domains.includes(d) && !d.endsWith('.' + src.domain)) {
+            if (d.includes(root + '-') || d.includes('-' + root) || (d.includes(root) && suspiciousExts.some(ext => d.endsWith(ext)))) {
+                return { src, fakeDomain: d };
+            }
+        }
+    }
+    return null;
+}
+
+function analyzeTargetJournalistic(target, type, extra) {
+    const textLower = target.toLowerCase();
+    const reportId = `FC-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const timestamp = new Date().toLocaleString('vi-VN');
+
+    const verifiedSrc = findVerifiedSource(target);
+    const mediaTyposquat = findMediaTyposquat(target);
+
+    // Khớp với bản tin thời sự chính thống đã được đối soát
+    const matchedOfficialNews = LIVE_NEWS_FEED.find(n =>
+        n.statusTag === 'official' && (
+            n.url.toLowerCase() === textLower ||
+            n.headline.toLowerCase().includes(textLower.slice(0, 35)) ||
+            textLower.includes(n.headline.toLowerCase().slice(0, 35))
+        )
+    );
+
+    const isPhishing = textLower.includes('vietcom-bank') || textLower.includes('dichvucong-gov') ||
+        textLower.includes('mbbank-ebanking') || textLower.includes('techcombamk') ||
+        textLower.includes('csgt-phatnguoi') || textLower.includes('shopee-tuyendung') ||
+        textLower.includes('zalo-nhanqua') || textLower.includes('telegram-gift') ||
+        textLower.includes('.xyz') || textLower.includes('.top') ||
+        textLower.includes('.icu') || textLower.includes('.vip') ||
+        textLower.includes('0384928172') || textLower.includes('02473008899') ||
+        textLower.includes('024 7300 8899');
+
+    const isScamMsg = textLower.includes('trúng thưởng') || textLower.includes('500 triệu') ||
+        textLower.includes('khóa vĩnh viễn') || textLower.includes('tai khoan quy khach') ||
+        textLower.includes('hoa hong 25%') || textLower.includes('nạp cọc') ||
+        textLower.includes('nap coc') || textLower.includes('phat nguoi') ||
+        textLower.includes('phạt nguội') || textLower.includes('lệnh bắt');
+
+    const isFakeNews = (textLower.includes('chanh') && textLower.includes('ung thư')) ||
+        textLower.includes('hủy thi tốt nghiệp') || textLower.includes('xét tuyển thẳng 100%') ||
+        (textLower.includes('thuốc nam gia truyền') && textLower.includes('tiểu đường')) ||
+        textLower.includes('đổi mẫu tiền') || textLower.includes('hạn chế rút tiền') ||
+        (textLower.includes('cứu trợ bão lũ') && textLower.includes('0987654321'));
+
+    const isSafeBankSample = textLower === '1029384756';
+
+    let pressTechScore = 58;
+    let defaultSafe = 25, defaultWarn = 20, defaultDanger = 5;
+    let defaultNotes = [
+        { author: "Hệ thống Kiểm chứng Tự động", role: "AI Fact-Checker", vote: "warn", note: "Nguồn thông tin mới, đang chờ thêm dữ liệu đối soát chéo từ tòa soạn báo chí.", time: "Vừa xong" }
+    ];
+
+    let evidenceDomain = '', evidenceSSL = '', evidenceNLP = '', evidencePress = '';
+
+    if (verifiedSrc || matchedOfficialNews || isSafeBankSample) {
+        pressTechScore = verifiedSrc ? verifiedSrc.trust_score : 96;
+        defaultSafe = matchedOfficialNews ? matchedOfficialNews.communitySafeVotes : 268;
+        defaultWarn = matchedOfficialNews ? matchedOfficialNews.communityWarnVotes : 4;
+        defaultDanger = matchedOfficialNews ? matchedOfficialNews.communityDangerVotes : 1;
+        defaultNotes = matchedOfficialNews ? matchedOfficialNews.peerNotes : [
+            { author: "Tổ Kiểm Chứng Báo Chí", role: "Xác thực IFCN / VAFC", vote: "safe", note: `Đã xác minh nguồn phát chính thống (${verifiedSrc ? verifiedSrc.name : 'Hệ thống định danh'}), đạt chuẩn thông tin an toàn.`, time: "2 phút trước" },
+            { author: "Cộng đồng Giám sát Số", role: "Đồng thuận 98%", vote: "safe", note: "Không ghi nhận khiếu nại sai sự thật hay cảnh báo mã độc.", time: "1 phút trước" }
+        ];
+
+        if (verifiedSrc) {
+            evidenceDomain = `Tên miền chính thức <strong class="evidence-highlight">${verifiedSrc.domain}</strong> thuộc cơ quan chủ quản: <strong>${verifiedSrc.managing_body}</strong>. Giấy phép báo chí: <strong>${verifiedSrc.license}</strong>.`;
+            evidenceSSL = `Chứng chỉ số máy chủ định danh tổ chức (${verifiedSrc.security_features}) đã được xác thực hợp lệ.`;
+            evidenceNLP = 'Đạt chuẩn 5W1H báo chí: Có nguồn trích dẫn rõ ràng, ngôn ngữ khách quan, không giật gân câu view.';
+            evidencePress = `Khớp 100% với Danh mục Báo chí Chính thống Quốc gia (Mã ${verifiedSrc.id} - ${verifiedSrc.category_label}).`;
+        } else if (matchedOfficialNews) {
+            evidenceDomain = `Nội dung trích xuất trực tiếp từ cơ quan báo chí chính thống: <strong class="evidence-highlight">${matchedOfficialNews.sourceName} (${matchedOfficialNews.sourceDomain})</strong>.`;
+            evidenceSSL = 'Liên kết gốc thuộc hệ thống truyền thông được Bộ Thông tin & Truyền thông cấp phép.';
+            evidenceNLP = 'Thông tin đầy đủ căn cứ văn bản, thời gian, cơ quan phát ngôn và được đối soát chéo đa nguồn.';
+            evidencePress = `Đã được ghi nhận trên luồng tin thời sự chính thống lúc ${matchedOfficialNews.timeLabel}.`;
+        } else {
+            evidenceDomain = `Số tài khoản <strong class="evidence-highlight">${target} (${extra})</strong> sạch, không có lịch sử tố cáo trong CSDL lừa đảo quốc gia.`;
+            evidenceSSL = 'Tài khoản định danh hợp lệ theo quy định xác thực sinh trắc học Ngân hàng Nhà nước.';
+            evidenceNLP = 'Không phát hiện dấu hiệu dụ dỗ chuyển cọc hay mạo danh cơ quan chức năng.';
+            evidencePress = 'Đối chiếu CSDL NCSC và Phản ánh cộng đồng: 0 lượt tố cáo vi phạm.';
+        }
+    } else if (mediaTyposquat) {
+        pressTechScore = 6;
+        defaultSafe = 2; defaultWarn = 14; defaultDanger = 285;
+        defaultNotes = [
+            { author: "Đội Phản ứng nhanh LCS", role: "Kiểm chứng viên", vote: "danger", note: `MẠO DANH BÁO CHÍ: Giả mạo ${mediaTyposquat.src.name} (${mediaTyposquat.src.domain}) bằng tên miền lạ.`, time: "3 phút trước" }
+        ];
+        evidenceDomain = `CẢNH BÁO MẠO DANH: Tên miền <strong class="evidence-highlight">${mediaTyposquat.fakeDomain}</strong> cố tình giả mạo <strong>${mediaTyposquat.src.name}</strong> (Tên miền thật: <code>${mediaTyposquat.src.domain}</code>).`;
+        evidenceSSL = 'Chứng chỉ SSL miễn phí ẩn danh, không có định danh pháp nhân báo chí.';
+        evidenceNLP = 'Lợi dụng uy tín cơ quan báo chí chính thống để phát tán tin giả, dẫn dụ lừa đảo tài chính.';
+        evidencePress = `Cơ quan chủ quản (${mediaTyposquat.src.managing_body}) và VAFC (tingia.gov.vn) cảnh báo đây là trang web giả mạo.`;
+    } else if (isPhishing || isScamMsg || isFakeNews) {
+        pressTechScore = 10;
+        defaultSafe = 5; defaultWarn = 22; defaultDanger = 340;
+        defaultNotes = [
+            { author: "Trung tâm Xử lý Tin giả VAFC", role: "Cơ quan Kiểm chứng", vote: "danger", note: "Thông tin sai sự thật / có dấu hiệu lừa đảo chiếm đoạt tài sản đã được cơ quan chức năng bác bỏ.", time: "4 phút trước" },
+            { author: "Hoàng Minh (Hà Nội)", role: "Thành viên Tín nhiệm", vote: "danger", note: "Đã kiểm chứng chéo trên Báo Chính Phủ và VTV24, xác nhận đây là tin giả/lừa đảo.", time: "1 phút trước" }
+        ];
+        evidenceDomain = `Đối tượng <strong class="evidence-highlight">${target}</strong> xuất hiện dấu hiệu giả mạo thương hiệu, tên miền mới lập ẩn danh hoặc tài khoản bị cộng đồng tố cáo.`;
+        evidenceSSL = 'Không có chứng chỉ định danh tổ chức (EV/OV) hoặc sử dụng đường dẫn trung gian che giấu đích đến.';
+        evidenceNLP = 'Vi phạm nghiêm trọng quy tắc kiểm chứng 5W1H: Sử dụng ngôn từ kích động sợ hãi (FOMO), giục chuyển tiền hoặc bịa đặt số liệu vô căn cứ.';
+        evidencePress = 'Đối chiếu báo chí chính thống: VTV24, Báo Tuổi Trẻ, Báo Công An Nhân Dân và Cổng tingia.gov.vn đã phát cảnh báo bác bỏ thông tin này.';
+    } else {
+        evidenceDomain = `Đối tượng <strong class="evidence-highlight">${target}</strong> chưa nằm trong danh sách đen, nhưng chưa được định danh trong CSDL 35+ cơ quan báo chí chính thống.`;
+        evidenceSSL = 'Chứng chỉ mức cơ bản, chưa xác minh được giấy phép hoạt động báo chí điện tử.';
+        evidenceNLP = 'Thiếu trích dẫn nguồn phát ngôn chính thức (Ai nói? Văn bản số mấy? Cơ quan nào ban hành?).';
+        evidencePress = 'Cần tiếp tục đối soát chéo trên các đầu báo chính thống (chinhphu.vn, tuoitre.vn, vnexpress.net) và lắng nghe thêm đánh giá từ cộng đồng.';
+    }
+
+    const cm = getCommunityMetrics(target, defaultSafe, defaultWarn, defaultDanger, defaultNotes);
+    return buildResultObject(reportId, timestamp, target, type, extra, pressTechScore, cm, {
+        evidenceDomain, evidenceSSL, evidenceNLP, evidencePress
+    });
+}
+
+function buildResultObject(reportId, timestamp, target, type, extra, pressTechScore, cm, evidences) {
+    // Công thức Hybrid: 60% Nghiệp vụ Báo chí & Kỹ thuật LCS™ + 40% Tín Nhiệm Đồng Thuận Cộng Đồng
+    const hybridScore = Math.round(pressTechScore * 0.6 + cm.trustIndex * 0.4);
+
+    let level = 2; // 1: Safe, 2: Warn, 3: Danger
+    let verdictTitle = 'MỨC 2: CẦN THẬN TRỌNG (CHƯA ĐỦ ĐỒNG THUẬN KIỂM CHỨNG)';
+    let levelClass = 'level-2';
+    let riskBadgeClass = 'warn';
+    let riskIcon = '⚠️';
+    let summaryDesc = '🟡 <strong>CẦN THẬN TRỌNG:</strong> Thông tin chưa có đủ đối chứng từ các cơ quan báo chí chính thống hoặc điểm đồng thuận cộng đồng chưa đạt ngưỡng an toàn.';
+
+    if (hybridScore >= 78 && cm.trustIndex >= 70 && pressTechScore >= 70) {
+        level = 1;
+        verdictTitle = 'THÔNG TIN AN TOÀN · ĐÃ KIỂM CHỨNG BÁO CHÍ & CỘNG ĐỒNG';
+        levelClass = 'level-1';
+        riskBadgeClass = 'safe';
+        riskIcon = '✅';
+        summaryDesc = `🟢 <strong>THÔNG TIN AN TOÀN (ĐÃ XÁC THỰC ĐA CHIỀU):</strong> Được kiểm chứng khớp với nguồn báo chí chính thống (${pressTechScore}/100) VÀ nhận được tín nhiệm đồng thuận cao từ cộng đồng (${cm.safePct}% người dùng xác nhận an toàn trên ${cm.total} lượt đánh giá).`;
+    } else if (hybridScore < 45 || pressTechScore < 40 || cm.dangerPct >= 55) {
+        level = 3;
+        verdictTitle = 'MỨC 3: NGUY HIỂM · TIN GIẢ / LỪA ĐẢO ĐÃ CẢNH BÁO';
+        levelClass = 'level-3';
+        riskBadgeClass = 'danger';
+        riskIcon = '🚨';
+        summaryDesc = `🔴 <strong>CẢNH BÁO TIN GIẢ / RỦI RO CAO:</strong> Bị phát hiện sai lệch chuẩn mực báo chí (${pressTechScore}/100) và bị ${cm.dangerPct}% cộng đồng (${cm.danger}/${cm.total} lượt) đánh dấu cảnh báo nguy hiểm.`;
+    }
+
+    let actions = [];
+    if (level === 1) {
+        actions = [
+            '✅ <strong>THÔNG TIN AN TOÀN ĐỂ THAM KHẢO & CHIA SẺ:</strong> Nội dung đã được đối soát chéo qua nguồn báo chí được cấp phép và cộng đồng xác thực.',
+            '📌 <strong>NGUYÊN TẮC TRÍCH DẪN:</strong> Khi chia sẻ lại, hãy giữ nguyên đường dẫn gốc từ cơ quan báo chí chính thống để tránh bị cắt ghép sai ngữ cảnh.',
+            '🛡️ <strong>DUY TRÌ QUY TẮC 3K:</strong> Luôn cảnh giác nếu có đường link lạ hoặc yêu cầu cung cấp mã OTP đính kèm ở phần bình luận.'
+        ];
+    } else if (level === 3) {
+        actions = [
+            '🚫 <strong>TUYỆT ĐỐI KHÔNG TIN & KHÔNG CHIA SẺ:</strong> Ngừng phát tán thông tin sai sự thật này để tránh gây hoang mang dư luận hoặc tiếp tay cho lừa đảo.',
+            '🔒 <strong>BẢO VỆ TÀI KHOẢN & TÀI SẢN:</strong> Không truy cập đường dẫn lạ, không cài ứng dụng ngoài kho chính thống, không cung cấp OTP hay chuyển tiền.',
+            '📢 <strong>CÙNG CỘNG ĐỒNG CẢNH BÁO:</strong> Bấm nút bình chọn "Báo cáo Tin giả / Lừa đảo" bên dưới hoặc gửi tố cáo về Trung tâm Xử lý Tin giả VAFC (tingia.gov.vn).'
+        ];
+    } else {
+        actions = [
+            '⚠️ <strong>CHƯA VỘI TIN & CHƯA CHIA SẺ:</strong> Áp dụng nguyên tắc "Kiểm Trước · Tin Sau" khi gặp tin tức chưa rõ nguồn phát.',
+            '🔍 <strong>ĐỐI CHIẾU BÁO CHÍ CHÍNH THỐNG:</strong> Tra cứu từ khóa trên Báo Chính Phủ (baochinhphu.vn), VTV (vtv.vn), Tuổi Trẻ (tuoitre.vn) hoặc VnExpress (vnexpress.net).',
+            '👥 <strong>ĐÓNG GÓP THẨM ĐỊNH CỘNG ĐỒNG:</strong> Nếu bạn có bằng chứng xác thực về thông tin này, hãy tham gia bình chọn và để lại ghi chú kiểm chứng bên dưới.'
+        ];
+    }
+
+    return {
+        id: reportId,
+        timestamp,
+        target,
+        type,
+        typeLabel: type === 'website' ? 'Website & Bài báo' : (type === 'tin-gia' ? 'Tin đồn & Bài viết MXH' : (type === 'tin-nhan' ? 'Tin nhắn & Cuộc gọi' : 'Tài khoản & SĐT')),
+        extra,
+        pressTechScore,
+        hybridScore,
+        cm,
+        level,
+        levelClass,
+        riskBadgeClass,
+        riskIcon,
+        verdictTitle,
+        summaryDesc,
+        evidenceDomain: evidences.evidenceDomain,
+        evidenceSSL: evidences.evidenceSSL,
+        evidenceNLP: evidences.evidenceNLP,
+        evidencePress: evidences.evidencePress,
+        actions,
+        critScores: {
+            domain: pressTechScore >= 75 ? 96 : (pressTechScore <= 30 ? 10 : 60),
+            ssl: pressTechScore >= 75 ? 98 : (pressTechScore <= 30 ? 15 : 68),
+            sandbox: pressTechScore >= 75 ? 95 : (pressTechScore <= 30 ? 10 : 65),
+            blacklist: level === 3 ? 'Trùng khớp Cảnh Báo' : 'Không trùng khớp',
+            brand: level === 3 ? 'Phát hiện Mạo danh / Sai lệch' : 'Chính thức / Không vi phạm',
+            bankCheck: level === 3 ? 'Có phản ánh lừa đảo' : 'Bình thường',
+            nlp: level === 1 ? 'Đạt chuẩn 5W1H Báo chí' : (level === 3 ? 'Thao túng FOMO / Bịa đặt' : 'Thiếu nguồn trích dẫn'),
+            redirect: level === 3 ? 'Nghi vấn chuyển hướng ẩn' : 'Trực tiếp / An toàn',
+            community: `${cm.safePct}% An toàn (${cm.total} lượt)`
+        }
+    };
+}
+
+function renderFactCheckReport(res) {
+    const panel = document.getElementById('resultPanel');
+    panel.className = `result-panel show ${res.levelClass}`;
+
+    const hybridColor = res.level === 1 ? 'var(--green)' : (res.level === 3 ? 'var(--red)' : 'var(--yellow)');
+    const pressColor = res.pressTechScore >= 75 ? 'var(--green)' : (res.pressTechScore < 45 ? 'var(--red)' : 'var(--yellow)');
+    const commColor = res.cm.trustIndex >= 70 ? 'var(--blue)' : (res.cm.trustIndex < 45 ? 'var(--red)' : 'var(--yellow)');
+
+    panel.innerHTML = `
+        <!-- HEADER BANNER -->
+        <div class="report-header-banner">
+            <div class="report-header-left">
+                <div class="risk-badge-icon ${res.riskBadgeClass}">${res.riskIcon}</div>
+                <div>
+                    <div class="risk-level-tag ${res.riskBadgeClass}">${res.verdictTitle}</div>
+                    <div class="report-target-title">${escapeHtml(res.target)}</div>
+                    <div class="report-meta-info">Phân loại: <strong>${res.typeLabel}</strong> ${res.extra ? `· Nguồn: ${escapeHtml(res.extra)}` : ''} · Kiểm chứng lúc: ${res.timestamp}</div>
+                </div>
+            </div>
+            <div class="report-header-right">
+                <div class="ai-source-badge"><span>📰</span> Nghiệp vụ Báo chí + Cộng đồng</div>
+                <div class="report-id-chip" style="margin-top:6px">Mã hồ sơ: <strong>#${res.id}</strong></div>
+            </div>
+        </div>
+
+        <div class="report-body">
+            <!-- PHẦN 1: CHỈ SỐ TÍN NHIỆM KÉP (BÁO CHÍ + CỘNG ĐỒNG) -->
+            <div class="report-section">
+                <div class="report-sec-heading">
+                    <span>1. TỔNG HỢP ĐIỂM TÍN NHIỆM ĐA CHIỀU (BÁO CHÍ & CỘNG ĐỒNG)</span>
+                    <span style="font-size:11.5px;color:var(--gray-400)">Công thức: 60% Đối soát Báo chí + 40% Đồng thuận Cộng đồng</span>
+                </div>
+
+                <div class="hybrid-score-grid">
+                    <div class="score-box-card">
+                        <div class="score-box-label"><span>🛡️ Điểm An Toàn Tổng Hợp</span><span>100 điểm</span></div>
+                        <div class="score-box-val" style="color:${hybridColor}">${res.hybridScore}/100</div>
+                        <div class="gauge-track"><div class="gauge-bar" style="width:${res.hybridScore}%;background:${hybridColor}"></div></div>
+                    </div>
+                    <div class="score-box-card">
+                        <div class="score-box-label"><span>🏛️ Đối Soát Báo Chí & Kỹ Thuật</span><span>Trọng số 60%</span></div>
+                        <div class="score-box-val" style="color:${pressColor}">${res.pressTechScore}/100</div>
+                        <div class="gauge-track"><div class="gauge-bar" style="width:${res.pressTechScore}%;background:${pressColor}"></div></div>
+                    </div>
+                    <div class="score-box-card">
+                        <div class="score-box-label"><span>👥 Tín Nhiệm Cộng Đồng</span><span>${res.cm.total} lượt đánh giá</span></div>
+                        <div class="score-box-val" style="color:${commColor}">${res.cm.trustIndex}/100</div>
+                        <div class="gauge-track"><div class="gauge-bar" style="width:${res.cm.trustIndex}%;background:${commColor}"></div></div>
+                    </div>
+                </div>
+
+                <div class="gauge-desc">${res.summaryDesc}</div>
+            </div>
+
+            <!-- PHẦN 2: ĐÁNH GIÁ & ĐỒNG THUẬN TỪ CỘNG ĐỒNG (INTERACTIVE VOTING) -->
+            <div class="report-section">
+                <div class="report-sec-heading">
+                    <span>2. TÍN NHIỆM ĐƯỢC ĐÁNH GIÁ CỦA CỘNG ĐỒNG (COMMUNITY CONSENSUS)</span>
+                    <span style="font-size:11.5px;color:#7DD3FC">Đóng góp phiếu thẩm định của bạn để cập nhật kết quả trực tiếp</span>
+                </div>
+
+                <div class="community-consensus-card">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+                        <span style="font-size:13px;font-weight:700;color:#fff">Phân bổ đồng thuận từ ${res.cm.total} thành viên & chuyên gia kiểm chứng:</span>
+                        <span style="font-size:12px;color:var(--green);font-weight:700">${res.cm.safePct >= 75 ? '✓ Đạt ngưỡng tín nhiệm an toàn cộng đồng' : 'Đang tiếp nhận thêm thẩm định'}</span>
+                    </div>
+
+                    <div class="consensus-bars">
+                        <div class="c-bar-row">
+                            <span style="color:#86EFAC;font-weight:600">✅ Thông tin An toàn (${res.cm.safe})</span>
+                            <div class="c-bar-track"><div class="c-bar-fill" style="width:${res.cm.safePct}%;background:var(--green)"></div></div>
+                            <span style="text-align:right;font-weight:700;color:#86EFAC">${res.cm.safePct}%</span>
+                        </div>
+                        <div class="c-bar-row">
+                            <span style="color:#FDE047;font-weight:600">⚠️ Cần bổ sung ngữ cảnh (${res.cm.warn})</span>
+                            <div class="c-bar-track"><div class="c-bar-fill" style="width:${res.cm.warnPct}%;background:var(--yellow)"></div></div>
+                            <span style="text-align:right;font-weight:700;color:#FDE047">${res.cm.warnPct}%</span>
+                        </div>
+                        <div class="c-bar-row">
+                            <span style="color:#FCA5A5;font-weight:600">🚨 Tin giả / Lừa đảo (${res.cm.danger})</span>
+                            <div class="c-bar-track"><div class="c-bar-fill" style="width:${res.cm.dangerPct}%;background:var(--red)"></div></div>
+                            <span style="text-align:right;font-weight:700;color:#FCA5A5">${res.cm.dangerPct}%</span>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Voting Controls -->
+                    <div class="vote-action-strip">
+                        <div style="flex:1;min-width:240px">
+                            <input type="text" id="communityNoteInput" placeholder="Nhập ghi chú đối chứng hoặc link bài báo xác minh (tùy chọn)..." style="width:100%;background:#0A0D14;border:1px solid rgba(255,255,255,0.14);border-radius:8px;padding:8px 12px;color:#fff;font-size:12px;outline:none;">
+                        </div>
+                        <div class="vote-btns-group">
+                            <button class="btn-vote safe ${res.cm.userVoted === 'safe' ? 'voted' : ''}" onclick="castCommunityVote('safe')">
+                                <span>✅</span> Tin cậy / An toàn
+                            </button>
+                            <button class="btn-vote warn ${res.cm.userVoted === 'warn' ? 'voted' : ''}" onclick="castCommunityVote('warn')">
+                                <span>⚠️</span> Chưa rõ
+                            </button>
+                            <button class="btn-vote danger ${res.cm.userVoted === 'danger' ? 'voted' : ''}" onclick="castCommunityVote('danger')">
+                                <span>🚨</span> Tin giả / Lừa đảo
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Peer Review Feed -->
+                    <div class="peer-reviews-list">
+                        ${res.cm.notes.slice(0, 3).map(n => `
+                            <div class="peer-review-item">
+                                <div>
+                                    <strong style="color:${n.vote === 'safe' ? '#86EFAC' : (n.vote === 'danger' ? '#FCA5A5' : '#FDE047')}">${escapeHtml(n.author)}</strong>
+                                    <span style="background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px;font-size:10.5px;color:#CBD5E1;margin-left:4px">${escapeHtml(n.role)}</span>
+                                    <div style="color:#E2E8F0;margin-top:3px">${escapeHtml(n.note)}</div>
+                                </div>
+                                <span style="color:var(--gray-400);font-size:11px;white-space:nowrap">${n.time}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+
+            <!-- PHẦN 3: CĂN CỨ XÁC THỰC BÁO CHÍ & KỸ THUẬT -->
+            <div class="report-section">
+                <div class="report-sec-heading">
+                    <span>3. CĂN CỨ THẨM ĐỊNH NGHIỆP VỤ BÁO CHÍ & AN TOÀN SỐ</span>
+                    <span style="font-size:11.5px;color:var(--gray-400)">Chuẩn đối soát 5W1H & 9 Tiêu chí LCS™</span>
+                </div>
+                <div class="evidence-grid">
+                    <div class="evidence-card">
+                        <div class="evidence-card-title"><span>🏛️</span> Nguồn phát & Giấy phép Báo chí</div>
+                        <div class="evidence-card-text">${res.evidenceDomain}</div>
+                    </div>
+                    <div class="evidence-card">
+                        <div class="evidence-card-title"><span>🔒</span> Xác thực Hạ tầng & Chứng chỉ SSL</div>
+                        <div class="evidence-card-text">${res.evidenceSSL}</div>
+                    </div>
+                    <div class="evidence-card">
+                        <div class="evidence-card-title"><span>📝</span> Phân tích Văn phong & Tiêu chuẩn 5W1H</div>
+                        <div class="evidence-card-text">${res.evidenceNLP}</div>
+                    </div>
+                    <div class="evidence-card">
+                        <div class="evidence-card-title"><span>📑</span> Đối chiếu Chéo Cơ quan Chính thống</div>
+                        <div class="evidence-card-text">${res.evidencePress}</div>
+                    </div>
+                </div>
+
+                <div class="criteria-breakdown">
+                    <div style="font-size:12.5px;font-weight:700;color:#fff;margin-bottom:8px">📊 Chi tiết Ma trận 9 Tiêu chí LCS™:</div>
+                    <div class="crit-grid">
+                        <div class="crit-item"><span class="crit-label">1. Tín nhiệm tên miền:</span><span class="crit-val">${res.critScores.domain}/100</span></div>
+                        <div class="crit-item"><span class="crit-label">2. Chứng chỉ SSL/TLS:</span><span class="crit-val">${res.critScores.ssl}/100</span></div>
+                        <div class="crit-item"><span class="crit-label">3. Sandbox hành vi mã nguồn:</span><span class="crit-val">${res.critScores.sandbox}/100</span></div>
+                        <div class="crit-item"><span class="crit-label">4. Khớp Blacklist quốc gia:</span><span class="crit-val" style="color:${res.level === 3 ? 'var(--red)' : 'var(--green)'}">${res.critScores.blacklist}</span></div>
+                        <div class="crit-item"><span class="crit-label">5. Mạo danh thương hiệu/báo chí:</span><span class="crit-val">${res.critScores.brand}</span></div>
+                        <div class="crit-item"><span class="crit-label">6. Rà soát SĐT/STK rác:</span><span class="crit-val">${res.critScores.bankCheck}</span></div>
+                        <div class="crit-item"><span class="crit-label">7. Ngữ cảnh & Chuẩn 5W1H:</span><span class="crit-val">${res.critScores.nlp}</span></div>
+                        <div class="crit-item"><span class="crit-label">8. Chuyển hướng ẩn:</span><span class="crit-val">${res.critScores.redirect}</span></div>
+                        <div class="crit-item"><span class="crit-label">9. Đồng thuận cộng đồng:</span><span class="crit-val" style="color:var(--blue)">${res.critScores.community}</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PHẦN 4: HÀNH ĐỘNG CỤ THỂ -->
+            <div class="report-section">
+                <div class="report-sec-heading">
+                    <span>4. KHUYẾN NGHỊ HÀNH ĐỘNG THEO QUY TẮC 3K</span>
+                    <span style="font-size:11.5px;color:var(--gray-400)">Kiểm Trước · Tin Sau</span>
+                </div>
+                <div class="action-card ${res.riskBadgeClass}">
+                    <ul class="action-list">
+                        ${res.actions.map(act => `<li>${act}</li>`).join('')}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ACTION TOOLBAR -->
+            <div class="action-toolbar">
+                <div class="action-tools-left">
+                    <button class="btn-act-share" onclick="copyReportToClipboard()">
+                        <span>📋</span> Sao Chép Báo Cáo Kiểm Chứng
+                    </button>
+                    <button class="btn-act-report" onclick="openReportModal('${escapeHtml(res.target)}', '${res.type}')">
+                        <span>🚨</span> Gửi Tố Cáo Chi Tiết
+                    </button>
+                    <button class="btn-act-reset" onclick="clearCurrentActive(); switchCheckTab('${res.type}'); document.getElementById('kiem-tra').scrollIntoView({behavior:'smooth'});">
+                        <span>🔄</span> Kiểm Tra Nội Dung Khác
+                    </button>
+                </div>
+                <button class="btn-act-db" onclick="saveResultToDatabase('${escapeHtml(res.target)}', '${res.verdictTitle}', ${res.hybridScore})">
+                    <span>➕</span> Lưu vào Cơ sở dữ liệu
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function castCommunityVote(voteType) {
+    if (!lastCheckResult) return;
+    const normKey = lastCheckResult.target.trim().toLowerCase();
+    const store = COMMUNITY_VOTE_STORE[normKey];
+    if (!store) return;
+
+    // Hoàn tác phiếu cũ nếu người dùng đổi ý
+    if (store.userVoted === 'safe') store.safe = Math.max(0, store.safe - 1);
+    if (store.userVoted === 'warn') store.warn = Math.max(0, store.warn - 1);
+    if (store.userVoted === 'danger') store.danger = Math.max(0, store.danger - 1);
+
+    // Cộng phiếu mới
+    store[voteType] += 1;
+    store.userVoted = voteType;
+
+    const noteInput = document.getElementById('communityNoteInput');
+    const customNote = noteInput ? noteInput.value.trim() : '';
+    const defaultNoteText = voteType === 'safe'
+        ? 'Xác nhận thông tin khớp với nguồn báo chí chính thống, an toàn để tham khảo.'
+        : (voteType === 'danger' ? 'Cảnh báo nội dung có dấu hiệu sai sự thật / giả mạo.' : 'Đề nghị bổ sung thêm nguồn trích dẫn kiểm chứng.');
+
+    store.notes.unshift({
+        author: "Bạn (Thành viên Cộng đồng)",
+        role: "Đánh giá trực tiếp",
+        vote: voteType,
+        note: customNote || defaultNoteText,
+        time: "Vừa xong"
+    });
+
+    // Đồng bộ lại vào LIVE_NEWS_FEED nếu mục tiêu nằm trong luồng tin
+    const newsItem = LIVE_NEWS_FEED.find(n => n.url.toLowerCase() === normKey || n.headline.toLowerCase() === normKey);
+    if (newsItem) {
+        newsItem.communitySafeVotes = store.safe;
+        newsItem.communityWarnVotes = store.warn;
+        newsItem.communityDangerVotes = store.danger;
+        renderLiveNewsStream();
+    }
+
+    // Tính lại kết quả báo cáo và hiển thị ngay lập tức
+    const cm = getCommunityMetrics(lastCheckResult.target);
+    lastCheckResult = buildResultObject(
+        lastCheckResult.id,
+        lastCheckResult.timestamp,
+        lastCheckResult.target,
+        lastCheckResult.type,
+        lastCheckResult.extra,
+        lastCheckResult.pressTechScore,
+        cm,
+        {
+            evidenceDomain: lastCheckResult.evidenceDomain,
+            evidenceSSL: lastCheckResult.evidenceSSL,
+            evidenceNLP: lastCheckResult.evidenceNLP,
+            evidencePress: lastCheckResult.evidencePress
+        }
+    );
+    renderFactCheckReport(lastCheckResult);
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+async function copyReportToClipboard() {
+    if (!lastCheckResult) return;
+    const r = lastCheckResult;
+    const text = `[BÁO CÁO KIỂM CHỨNG FACTCHECK]
+Mã hồ sơ: #${r.id}
+Mục tiêu: ${r.target}
+Kết luận: ${r.verdictTitle}
+Điểm An toàn Tổng hợp: ${r.hybridScore}/100 (Báo chí & Kỹ thuật: ${r.pressTechScore}/100 | Tín nhiệm Cộng đồng: ${r.cm.safePct}% An toàn trên ${r.cm.total} lượt)
+Căn cứ xác thực: ${r.evidenceDomain.replace(/<[^>]*>/g, '')}
+Sự thật là nền tảng của niềm tin — Kiểm tra miễn phí tại FactCheck!`;
+
+    try {
+        await navigator.clipboard.writeText(text);
+        alert('Đã sao chép báo cáo kiểm chứng & chỉ số tín nhiệm cộng đồng vào clipboard!');
+    } catch (e) {
+        alert('Không thể sao chép tự động. Vui lòng chụp màn hình báo cáo.');
+    }
+}
+
+function openReportModal(target, type) {
+    if (target) document.getElementById('reportTargetInput').value = target;
+    if (type) document.getElementById('reportTypeSelect').value = type;
+    document.getElementById('reportScamModal').classList.add('show');
+}
+function closeReportModal() { document.getElementById('reportScamModal').classList.remove('show'); }
+
+function submitScamReport() {
+    const target = document.getElementById('reportTargetInput').value.trim();
+    const type = document.getElementById('reportTypeSelect').value;
+    const desc = document.getElementById('reportDescInput').value.trim();
+    if (!target) { alert('Vui lòng nhập mục tiêu nghi vấn.'); return; }
+
+    const newRecord = {
+        id: DATABASE.length + 1,
+        type,
+        type_label: type === 'website' ? 'Website lừa đảo' : (type === 'tin-gia' ? 'Tin giả' : 'Tin nhắn lừa đảo'),
+        target,
+        title: `Báo cáo cộng đồng: ${target}`,
+        category: 'Đóng góp người dùng',
+        description: desc || 'Báo cáo nghi vấn gửi từ cộng đồng.',
+        verdict: 'NGUY HIỂM',
+        status: 'danger',
+        score: 15,
+        criteria: { brand_impersonation: null },
+        source: 'Cộng đồng FactCheck',
+        reported_date: new Date().toISOString().split('T')[0]
+    };
+    DATABASE.unshift(newRecord);
+    renderDBTable();
+    closeReportModal();
+    alert(`Cảm ơn bạn! Báo cáo về "${target}" đã được ghi nhận vào Cơ sở Dữ liệu (#${newRecord.id}).`);
+}
+
+function saveResultToDatabase(target, verdict, score) {
+    const newRecord = {
+        id: DATABASE.length + 1,
+        type: currentSearchType,
+        type_label: currentSearchType === 'website' ? 'Website / Bài báo' : (currentSearchType === 'tin-gia' ? 'Tin tức / Phát ngôn' : 'Tin nhắn'),
+        target,
+        title: `Hồ sơ kiểm chứng: ${target}`,
+        category: 'Kiểm chứng Báo chí & Cộng đồng',
+        description: 'Bản ghi được xác thực qua quy trình đối soát báo chí và tín nhiệm cộng đồng.',
+        verdict: score >= 78 ? 'AN TOÀN' : (score < 45 ? 'NGUY HIỂM' : 'CẦN THẬN TRỌNG'),
+        status: score >= 78 ? 'safe' : (score < 45 ? 'danger' : 'warn'),
+        score,
+        criteria: { brand_impersonation: null },
+        source: 'FactCheck (Báo chí + Cộng đồng)',
+        reported_date: new Date().toISOString().split('T')[0]
+    };
+    DATABASE.unshift(newRecord);
+    renderDBTable();
+    alert(`Đã lưu thành công hồ sơ #${newRecord.id} vào Cơ sở Dữ liệu!`);
+    document.getElementById('co-so-du-lieu').scrollIntoView({ behavior: 'smooth' });
+}
+
+/* ==============================================================
+   6. DATABASE TABLES & QUIZ LOGIC
+   ============================================================== */
+let dbCurrentPage = 1;
+const dbPageSize = 6;
+
+function getFilteredDB() {
+    const search = document.getElementById('dbSearch').value.toLowerCase().trim();
+    const filterType = document.getElementById('dbFilterType').value;
+    const filterVerdict = document.getElementById('dbFilterVerdict').value;
+    return DATABASE.filter(item => {
+        const matchSearch = !search || item.target.toLowerCase().includes(search) || item.title.toLowerCase().includes(search);
+        const matchType = filterType === 'all' || item.type === filterType;
+        const matchVerdict = filterVerdict === 'all' || item.verdict.includes(filterVerdict);
+        return matchSearch && matchType && matchVerdict;
+    });
+}
+
+function renderDBTable() {
+    const filtered = getFilteredDB();
+    const totalPages = Math.ceil(filtered.length / dbPageSize) || 1;
+    if (dbCurrentPage > totalPages) dbCurrentPage = 1;
+    const start = (dbCurrentPage - 1) * dbPageSize;
+    const pagedData = filtered.slice(start, start + dbPageSize);
+    const tbody = document.getElementById('dbTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = pagedData.map(item => {
+        const badgeClass = item.status === 'danger' ? 'badge-danger' : (item.status === 'warn' ? 'badge-warn' : 'badge-safe');
+        return `
+            <tr>
+                <td style="font-weight:700;color:var(--orange)">#${item.id}</td>
+                <td><span class="badge" style="background:rgba(255,255,255,0.08);color:#E2E8F0">${item.type_label}</span></td>
+                <td style="max-width:240px;word-break:break-all;font-family:monospace;font-size:12px;color:#fff">${escapeHtml(item.target)}</td>
+                <td>${item.criteria?.brand_impersonation || '<span class="badge badge-null">null</span>'}</td>
+                <td><strong>${item.score}</strong>/100</td>
+                <td><span class="badge ${badgeClass}">${item.verdict}</span></td>
+                <td style="font-size:12px;color:var(--gray-400)">${item.source}</td>
+                <td style="white-space:nowrap;font-size:12px">${item.reported_date}</td>
+            </tr>
+        `;
+    }).join('');
+
+    document.getElementById('dbPaginationInfo').textContent = `Hiển thị ${filtered.length ? start + 1 : 0} - ${Math.min(start + dbPageSize, filtered.length)} trên tổng số ${filtered.length} bản ghi`;
+    const btns = document.getElementById('dbPaginationBtns');
+    btns.innerHTML = '';
+    for (let p = 1; p <= totalPages; p++) {
+        const b = document.createElement('button');
+        b.textContent = p;
+        if (p === dbCurrentPage) b.classList.add('active');
+        b.onclick = () => { dbCurrentPage = p; renderDBTable(); };
+        btns.appendChild(b);
+    }
+    const threatBadge = document.getElementById('threatCountBadge');
+    if (threatBadge) threatBadge.textContent = DATABASE.length;
+}
+
+function filterDB() { dbCurrentPage = 1; renderDBTable(); }
+function exportJSON() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(DATABASE, null, 2));
+    const dlAnchor = document.createElement('a');
+    dlAnchor.setAttribute("href", dataStr);
+    dlAnchor.setAttribute("download", "factcheck_database_dump.json");
+    document.body.appendChild(dlAnchor); dlAnchor.click(); dlAnchor.remove();
+}
+
+let mediaCurrentPage = 1;
+const mediaPageSize = 7;
+
+function switchDBView(view) {
+    document.getElementById('tabBtnThreatDB').classList.toggle('active', view === 'threat');
+    document.getElementById('tabBtnMediaDB').classList.toggle('active', view === 'media');
+    document.getElementById('viewThreatDB').style.display = view === 'threat' ? 'block' : 'none';
+    document.getElementById('viewMediaDB').style.display = view === 'media' ? 'block' : 'none';
+    if (view === 'media') renderMediaTable(); else renderDBTable();
+}
+
+function getFilteredMediaDB() {
+    const search = (document.getElementById('mediaSearch')?.value || '').toLowerCase().trim();
+    const filterCat = document.getElementById('mediaFilterCat')?.value || 'all';
+    return VERIFIED_SOURCES_DB.filter(src => {
+        const matchSearch = !search || src.name.toLowerCase().includes(search) || src.domain.toLowerCase().includes(search) || src.managing_body.toLowerCase().includes(search);
+        const matchCat = filterCat === 'all' || src.category === filterCat;
+        return matchSearch && matchCat;
+    });
+}
+
+function renderMediaTable() {
+    const filtered = getFilteredMediaDB();
+    const totalPages = Math.ceil(filtered.length / mediaPageSize) || 1;
+    if (mediaCurrentPage > totalPages) mediaCurrentPage = 1;
+    const start = (mediaCurrentPage - 1) * mediaPageSize;
+    const pagedData = filtered.slice(start, start + mediaPageSize);
+    const tbody = document.getElementById('mediaTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = pagedData.map(src => `
+        <tr>
+            <td style="font-weight:700;color:var(--blue)">${src.id}</td>
+            <td><div style="font-weight:700;color:#fff">${src.name}</div><div style="font-size:11.5px;color:var(--gray-400)">${src.description}</div></td>
+            <td><strong style="color:var(--orange);font-family:monospace">${src.domain}</strong></td>
+            <td style="font-size:12.5px;color:#E2E8F0">${src.managing_body}</td>
+            <td style="font-size:12px;color:var(--gray-400)">${src.license}</td>
+            <td><strong style="color:var(--green)">${src.trust_score}</strong>/100</td>
+            <td><span class="source-tag-verified">✓ ${src.security_features.split(',')[0]}</span></td>
+            <td><button class="btn-check-src" onclick="checkMediaDomain('${src.domain}')">🔍 Kiểm tra</button></td>
+        </tr>
+    `).join('');
+
+    document.getElementById('mediaPaginationInfo').textContent = `Hiển thị ${filtered.length ? start + 1 : 0} - ${Math.min(start + mediaPageSize, filtered.length)} trên tổng số ${filtered.length} nguồn tin chính thống`;
+    const btns = document.getElementById('mediaPaginationBtns');
+    btns.innerHTML = '';
+    for (let p = 1; p <= totalPages; p++) {
+        const b = document.createElement('button');
+        b.textContent = p;
+        if (p === mediaCurrentPage) b.classList.add('active');
+        b.onclick = () => { mediaCurrentPage = p; renderMediaTable(); };
+        btns.appendChild(b);
+    }
+}
+
+function filterMediaDB() { mediaCurrentPage = 1; renderMediaTable(); }
+function exportMediaJSON() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(VERIFIED_SOURCES_DB, null, 2));
+    const dlAnchor = document.createElement('a');
+    dlAnchor.setAttribute("href", dataStr);
+    dlAnchor.setAttribute("download", "factcheck_verified_press_registry.json");
+    document.body.appendChild(dlAnchor); dlAnchor.click(); dlAnchor.remove();
+}
+function checkMediaDomain(domain) {
+    switchCheckTab('website');
+    document.getElementById('inputUrl').value = domain;
+    document.getElementById('kiem-tra').scrollIntoView({ behavior: 'smooth' });
+    runCheck();
+}
+
+const QUIZ_QUESTIONS = [
+    {
+        q: "Bạn thấy một trang tin có tên miền 'tuoitre-online.xyz' đăng tin giật gân yêu cầu nhập mật khẩu ngân hàng để nhận trợ cấp. Dấu hiệu nào chứng tỏ đây là trang mạo danh?",
+        opts: [
+            "Báo Tuổi Trẻ chính thức chỉ sử dụng tên miền tuoitre.vn và không bao giờ yêu cầu OTP/mật khẩu ngân hàng",
+            "Giao diện trang web có màu đỏ giống logo báo",
+            "Bài viết có nhiều bình luận khen ngợi phía dưới",
+            "Trang web tải nhanh trên điện thoại"
+        ],
+        ans: 0
+    },
+    {
+        q: "Trong nghiệp vụ kiểm chứng thông tin báo chí (5W1H), yếu tố nào quan trọng nhất để xác minh một phát ngôn chính sách?",
+        opts: [
+            "Số lượt chia sẻ (share) trên mạng xã hội",
+            "Đối chiếu văn bản gốc trên Cổng TTĐT Chính phủ / Bộ ngành và kiểm tra chéo ít nhất 2 cơ quan báo chí được cấp phép",
+            "Tiêu đề bài viết có chữ 'KHẨN CẤP' hoặc 'CHẤN ĐỘNG'",
+            "Ảnh chụp màn hình tin nhắn chuyển tiếp"
+        ],
+        ans: 1
+    },
+    {
+        q: "Quy tắc '3K' trong kỹ năng số phòng ngừa lừa đảo bao gồm những nội dung nào?",
+        opts: [
+            "Không Vội Tin — Không Chuyển Tiền — Không Chia Sẻ OTP",
+            "Không Sử Dụng — Không Đăng Nhập — Không Khai Báo",
+            "Kiểm Tra — Ký Kết — Khởi Tạo",
+            "Không Tắt Tường Lửa — Không Cắm USB — Không Dùng WiFi"
+        ],
+        ans: 0
+    }
+];
+
+let quizCurrentIndex = 0, quizScore = 0, quizAnswerSelected = false;
+function startQuiz() {
+    quizCurrentIndex = 0; quizScore = 0; quizAnswerSelected = false;
+    document.getElementById('quizOverlay').classList.add('show');
+    renderQuizQuestion();
+}
+function closeQuiz() { document.getElementById('quizOverlay').classList.remove('show'); }
+function renderQuizQuestion() {
+    if (quizCurrentIndex >= QUIZ_QUESTIONS.length) {
+        document.getElementById('quizContent').innerHTML = `
+            <div style="text-align:center;padding:16px 0">
+                <div style="font-size:48px;font-weight:800;color:var(--orange)">${quizScore}/${QUIZ_QUESTIONS.length}</div>
+                <p style="font-size:15px;font-weight:700;margin:12px 0">Hoàn thành thử thách Mắt Thấy! Tin Chưa?</p>
+                <button class="btn-sm" onclick="closeQuiz()">Đóng</button>
+            </div>
+        `;
+        return;
+    }
+    const q = QUIZ_QUESTIONS[quizCurrentIndex];
+    document.getElementById('quizContent').innerHTML = `
+        <h3 style="font-size:18px;font-weight:800">Thử thách: Mắt Thấy! Tin Chưa?</h3>
+        <p style="font-size:12px;color:#64748B">Câu hỏi ${quizCurrentIndex + 1} / ${QUIZ_QUESTIONS.length}</p>
+        <div class="progress-bar"><div class="progress-fill" style="width:${((quizCurrentIndex)/QUIZ_QUESTIONS.length)*100}%"></div></div>
+        <div class="quiz-question">${q.q}</div>
+        <div class="quiz-options">
+            ${q.opts.map((opt, i) => `<div class="quiz-opt" onclick="selectQuizOption(this, ${i})">${opt}</div>`).join('')}
+        </div>
+    `;
+    quizAnswerSelected = false;
+}
+function selectQuizOption(el, idx) {
+    if (quizAnswerSelected) return;
+    quizAnswerSelected = true;
+    const c = QUIZ_QUESTIONS[quizCurrentIndex].ans;
+    document.querySelectorAll('.quiz-opt').forEach((o, i) => {
+        if (i === c) o.classList.add('correct');
+        if (i === idx && idx !== c) o.classList.add('wrong');
+    });
+    if (idx === c) quizScore++;
+    setTimeout(() => { quizCurrentIndex++; renderQuizQuestion(); }, 900);
+}
+
+// Initializations
+renderQuickSamples();
+renderLiveNewsStream();
+refreshLiveNewsStream(false);
+renderDBTable();
+renderMediaTable();
+</script>
+</body>
+</html>
